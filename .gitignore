@@ -1,0 +1,6 @@
+node_modules
+yarn.lock
+
+mariadb-data/*
+!mariadb-data/initdb.d
+.env
