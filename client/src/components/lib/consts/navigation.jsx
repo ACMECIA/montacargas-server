@@ -9,6 +9,10 @@ import {
   HiOutlineCog,
 } from "react-icons/hi";
 
+import { FaTools } from "react-icons/fa";
+
+import { FaBell } from "react-icons/fa";
+
 import { MdCalendarMonth } from "react-icons/md";
 
 import { AiOutlineLineChart } from "react-icons/ai";
@@ -41,6 +45,19 @@ export const DASHBOARD_SIDEBAR_LINKS = [
     path: "/operation",
     icon: <AiOutlineLineChart />,
   },
+  {
+    key: "manteinance",
+    label: "Mantenimiento",
+    path: "/maintenance",
+    icon: <FaTools />,
+  },
+
+  {
+    key: "alerts",
+    label: "Alertas",
+    path: "/alerts",
+    icon: <FaBell />,
+  },
 ];
 
 export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
@@ -49,11 +66,5 @@ export const DASHBOARD_SIDEBAR_BOTTOM_LINKS = [
     label: "Settings",
     path: "/settings",
     icon: <HiOutlineCog />,
-  },
-  {
-    key: "support",
-    label: "Help & Support",
-    path: "/support",
-    icon: <HiOutlineQuestionMarkCircle />,
   },
 ];

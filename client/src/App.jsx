@@ -1,9 +1,11 @@
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./components/shared/Layout";
 import EstatusSistema from "./components/00_EstatusSistema";
-import EstatusOperacion from "./components/03_EstatusOperacion";
 import EstatusMensual from "./components/01_EstatusMensual";
 import AnalisisOperacion from "./components/02_AnalisisOperacion";
+import EstatusOperacion from "./components/03_EstatusOperacion";
+import Mantenimiento from "./components/04_Mantenimiento";
+import Alertas from "./components/05_Alertas";
 import LoginView from "./components/Login";
 import { useEffect, useState } from "react";
 import { getHostPath, setHost, setHostNode } from "./utils/host";
@@ -28,6 +30,8 @@ function App() {
           <Route path="analysis" element={<AnalisisOperacion />} />
           <Route path="operation" element={<EstatusOperacion />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="maintenance" element={<Mantenimiento />} />
+          <Route path="alerts" element={<Alertas />} />
         </Route>
 
         <Route path="login" element={<LoginView />} />
