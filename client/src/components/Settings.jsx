@@ -7,6 +7,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 import DeviceSchedule from "./utils/settings/DeviceSchedule";
+import UserManagement from "./utils/settings/UserManagement";
 
 export default function Settings() {
   const [rol, setRol] = useState("");
@@ -58,7 +59,9 @@ export function SettingsDisplay() {
       </div>
 
       <div className="col-span-1 flex flex-col gap-4">
-        <Box></Box>
+        <Box>
+          <UserManagement chartName={"Gestión de Usuarios"}></UserManagement>
+        </Box>
 
         <Box></Box>
       </div>

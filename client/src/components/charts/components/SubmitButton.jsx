@@ -2,7 +2,7 @@ import { Button } from "antd";
 import React, { Fragment } from "react";
 import { ConfigProvider } from "antd";
 
-export default function RefreshButton({ width = "25%" }) {
+export default function RefreshButton({ width = "20%" }) {
   return (
     <Fragment>
       <ConfigProvider

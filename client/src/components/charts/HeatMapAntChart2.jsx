@@ -147,21 +147,20 @@ export function NumberRange({ label1, label2, units, width, value, onChange }) {
     current[0] = val === null ? 0 : val;
     onChange(current);
   };
-  
+
   const on2Change = (val) => {
     const current = value ? [...value] : [];
     current[1] = val === null ? 0 : val;
     onChange(current);
   };
-  
+
   // const onSubmit = () => {
   //   if (value[0] > value[1]) {
   //     alert("El valor inicial no puede ser mayor al valor final");
   //     return;
   //   }
-  
-  // };
 
+  // };
 
   return (
     <Space.Compact block style={{ width: width }}>
@@ -216,7 +215,7 @@ export function SelectState({ label, width, value, onChange }) {
   );
 }
 
-export function FormFilter({ width = "70%", formName, fetchData }) {
+export function FormFilter({ width = "40%", formName, fetchData }) {
   const formItemLayout = {
     labelCol: {
       xs: {
@@ -300,19 +299,6 @@ export function FormFilter({ width = "70%", formName, fetchData }) {
           label1={"Peso Inicial"}
           label2={"Peso Final"}
           units={"Ton."}
-          width={width}
-        />
-      </Form.Item>
-
-      <Form.Item
-        name="height-filter"
-        label="Rango de Alturas (m)"
-        // {...rangeConfig}
-      >
-        <NumberRange
-          label1={"Altura Inicial"}
-          label2={"Altura Final"}
-          units={"m"}
           width={width}
         />
       </Form.Item>

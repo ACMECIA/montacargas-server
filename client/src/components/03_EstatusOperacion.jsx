@@ -2,6 +2,7 @@ import React from "react";
 import RealTimeChart from "./charts/RealTimeChart";
 import Box from "./shared/Box";
 import DownloadData from "./utils/DownloadData";
+import GeneralReport from "./utils/GeneralReport";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -36,17 +37,17 @@ export default function EstatusOperacion() {
         </Box>
       </div>
 
-      <div className="flex flex-row gap-4 w-full">
+      <div className="flex flex-row gap-4 w-full ">
         <Box>
           <DownloadData dataPath={"download"} serverType={"utils"} />
+          <GeneralReport dataPath={"download"} serverType={"utils"} />
         </Box>
-      </div>
-
-      <div className="flex flex-row gap-4 w-full">
         <Box>
           <DoubleBellChart dataPath={"bell"} serverType={"charts"} />
         </Box>
       </div>
+
+      <div className="flex flex-row gap-4 w-full"></div>
     </div>
   );
 }

@@ -6,8 +6,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DoubleBellChart from "./charts/DoubleBellChart";
+import AlertsTable from "./utils/AlertsTable";
+import AlertsReport from "./utils/AlertsReport";
 
-export default function EstatusOperacion() {
+export default function Alertas() {
   // const [name, setName] = useState("");
   // const navigate = useNavigate();
   // useEffect(() => {
@@ -27,24 +29,17 @@ export default function EstatusOperacion() {
     <div className="flex flex-col gap-4 px-4 py-4 ">
       <div className="flex flex-row gap-4 w-full">
         <Box>
-          <RealTimeChart
-            serverType={"charts"}
-            chartName={"Monitoreo general de condiciones"}
-            dataPath={"realtime"}
-            dataRate={1000}
+          <AlertsTable
+            dataPath={"alerts"}
+            serverType={"utils"}
+            tableName={"Alertas"}
           />
         </Box>
       </div>
 
       <div className="flex flex-row gap-4 w-full">
         <Box>
-          <DownloadData dataPath={"download"} serverType={"utils"} />
-        </Box>
-      </div>
-
-      <div className="flex flex-row gap-4 w-full">
-        <Box>
-          <DoubleBellChart dataPath={"bell"} serverType={"charts"} />
+          <AlertsReport></AlertsReport>
         </Box>
       </div>
     </div>

@@ -95,7 +95,7 @@ export default function Header() {
           )}
         </Popover> */}
 
-        <div className="flex items-center gap-2 mr-10">
+        <div className="flex items-center gap-2 mr-10 myBlink">
           <GoAlert fontSize={50} className="text-red-600" />
           <span className="text-red-600">Mantenimiento</span>
         </div>

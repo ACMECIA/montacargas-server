@@ -9,6 +9,7 @@ import RefreshButton from "./components/RefreshButton";
 
 import { getHostPath } from "../../utils/host";
 import useLocalStorage from "use-local-storage";
+import { websiteColors } from "../lib/utils/colors";
 
 // Load Highcharts modules
 require("highcharts/indicators/indicators")(Highcharts);
@@ -18,15 +19,18 @@ require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/map")(Highcharts);
 
 const array1 = [60, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array2 = [60, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 export default function BarChart({
   chartName,
   dataPath,
-  dataRate,
   serverType,
-  varName,
+
+  labelName1,
+  labelName2,
 }) {
   const [data1, setData1] = useLocalStorage(`${dataPath}`, array1);
+  const [data2, setData2] = useLocalStorage(`${dataPath}2`, array2);
 
   // const [data1, setData1] = useState(array1);
   // const [data2, setData2] = useState(array2);
@@ -45,6 +49,7 @@ export default function BarChart({
         .then((data) => {
           console.log(data.payload);
           setData1(data.payload.array1);
+          setData2(data.payload.array2);
           setIsFetching(false);
 
           // setPosts(data);
@@ -172,9 +177,15 @@ export default function BarChart({
     series: [
       {
         animation: false,
-        name: `${varName}`,
-        color: "rgb(14,18,113)",
+        name: `${labelName1}`,
+        color: `${websiteColors["komatsu-blue"]}`,
         data: data1,
+      },
+      {
+        animation: false,
+        name: `${labelName2}`,
+        color: `${websiteColors["komatsu-blue-light"]}`,
+        data: data2,
       },
     ],
   };

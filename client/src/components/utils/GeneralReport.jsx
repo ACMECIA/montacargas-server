@@ -3,7 +3,7 @@ import DatePickerComponent from "../charts/components/DatePicker";
 import DownloadButton from "../charts/components/DownloadButton";
 import { useState } from "react";
 
-export default function DownloadData({ dataPath, serverType }) {
+export default function GeneralReport({ dataPath, serverType }) {
   const [dates, setDates] = useState([]);
   const onRangeChange = (date_values, dateStrings) => {
     console.log(date_values);
@@ -13,7 +13,7 @@ export default function DownloadData({ dataPath, serverType }) {
   return (
     <div className="py-10 px-5">
       <div className="flex flex-row justify-between">
-        <strong className="text-gray-700 font-medium">Descarga de data</strong>
+        <strong className="text-gray-700 font-medium">Reporte General</strong>
       </div>
 
       <div className="flex flex-row justify-center gap-4">

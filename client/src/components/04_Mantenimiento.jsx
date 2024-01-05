@@ -6,8 +6,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DoubleBellChart from "./charts/DoubleBellChart";
-
-export default function EstatusOperacion() {
+import BarChart from "./charts/BarChart";
+import BarChart2 from "./charts/BarChart2";
+export default function Mantenimiento() {
   // const [name, setName] = useState("");
   // const navigate = useNavigate();
   // useEffect(() => {
@@ -24,28 +25,39 @@ export default function EstatusOperacion() {
   // }, []);
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4 ">
-      <div className="flex flex-row gap-4 w-full">
+    <div className="grid grid-cols-2 w-full gap-4 p-4">
+      <div className="col-span-1 flex flex-col gap-4">
         <Box>
-          <RealTimeChart
+          <BarChart
+            dataPath={"bar"}
             serverType={"charts"}
-            chartName={"Monitoreo general de condiciones"}
-            dataPath={"realtime"}
-            dataRate={1000}
+            chartName={"Disponibilidad"}
+            varName={"Disponibilidad"}
+          />
+        </Box>
+
+        <Box>
+          <BarChart2
+            dataPath={"bar1"}
+            serverType={"charts"}
+            chartName={"Horas de detenciones"}
+            labelName1={"Mantenimiento correctivo"}
+            labelName2={"Mantenimiento preventivo"}
           />
         </Box>
       </div>
 
-      <div className="flex flex-row gap-4 w-full">
+      <div className="col-span-1 flex flex-col gap-4">
         <Box>
-          <DownloadData dataPath={"download"} serverType={"utils"} />
+          <BarChart
+            dataPath={"bar1"}
+            serverType={"charts"}
+            chartName={"Confiabilidad"}
+            varName={"Confiabilidad"}
+          />
         </Box>
-      </div>
 
-      <div className="flex flex-row gap-4 w-full">
-        <Box>
-          <DoubleBellChart dataPath={"bell"} serverType={"charts"} />
-        </Box>
+        <Box></Box>
       </div>
     </div>
   );
