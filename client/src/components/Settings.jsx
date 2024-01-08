@@ -60,7 +60,11 @@ export function SettingsDisplay() {
 
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
-          <UserManagement chartName={"Gestión de Usuarios"}></UserManagement>
+          <UserManagement
+            chartName={"Gestión de Usuarios"}
+            serverType={"users"}
+            dataPath={"clients"}
+          ></UserManagement>
         </Box>
 
         <Box></Box>
