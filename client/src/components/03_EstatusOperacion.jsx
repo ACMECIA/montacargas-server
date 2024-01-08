@@ -43,7 +43,11 @@ export default function EstatusOperacion() {
           <GeneralReport dataPath={"download"} serverType={"utils"} />
         </Box>
         <Box>
-          <DoubleBellChart dataPath={"bell"} serverType={"charts"} />
+          <DoubleBellChart
+            dataPath={"bell"}
+            serverType={"charts"}
+            chartName={"Campana de Gauss"}
+          />
         </Box>
       </div>
 

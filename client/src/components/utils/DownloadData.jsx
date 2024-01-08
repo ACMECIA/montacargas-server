@@ -11,7 +11,7 @@ export default function DownloadData({ dataPath, serverType }) {
     console.log(dates);
   };
   return (
-    <div className="py-10 px-5">
+    <div className="py-10 px-5 space-y-2">
       <div className="flex flex-row justify-between">
         <strong className="text-gray-700 font-medium">Descarga de data</strong>
       </div>

@@ -2,7 +2,7 @@ import { Button } from "antd";
 import React, { Fragment } from "react";
 import { ConfigProvider } from "antd";
 
-export default function RefreshButton({ width = "20%" }) {
+export default function RefreshButton({ children, width = "20%" }) {
   return (
     <Fragment>
       <ConfigProvider
@@ -19,7 +19,7 @@ export default function RefreshButton({ width = "20%" }) {
           style={{ width: width }}
           htmlType="submit"
         >
-          Actualizar
+          {children}
         </Button>
       </ConfigProvider>
     </Fragment>

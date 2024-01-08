@@ -6,7 +6,7 @@ import SubmitButton from "../../charts/components/SubmitButton";
 import { Checkbox, ConfigProvider, Form, Input, Button } from "antd";
 import "../../../index.css";
 
-export default function UserManagement({ chartName, serverType, dataPath }) {
+export default function GeneralSettings({ chartName, serverType, dataPath }) {
   const [isFetching, setIsFetching] = useState(false);
   const [addUser, setAddUser] = useState(false);
   const [deleteUser, setDeleteUser] = useState(false);

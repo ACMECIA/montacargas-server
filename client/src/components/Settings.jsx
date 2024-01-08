@@ -5,6 +5,7 @@ import Box from "./shared/Box";
 import DoubleBellChart from "./charts/DoubleBellChart";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import GeneralSettings from "./utils/settings/GeneralSettings";
 
 import DeviceSchedule from "./utils/settings/DeviceSchedule";
 import UserManagement from "./utils/settings/UserManagement";
@@ -55,7 +56,13 @@ export function SettingsDisplay() {
           <DeviceSchedule chartName={"Horario del Sistema"}></DeviceSchedule>
         </Box>
 
-        <Box></Box>
+        <Box>
+          <GeneralSettings
+            chartName={"Ajustes generales"}
+            serverType={"settings"}
+            dataPath={"general"}
+          />
+        </Box>
       </div>
 
       <div className="col-span-1 flex flex-col gap-4">

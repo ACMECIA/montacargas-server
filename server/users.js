@@ -40,3 +40,59 @@ UsersRouter.get("/clients", (req, res) => {
     res.send(result);
   });
 });
+
+UsersRouter.post("/clients/delete", (req, res) => {
+  console.log("UsersRouter/clients/delete");
+  // Delete users rows according to the ids obtained in an array
+  const sqlDelete = "DELETE FROM users WHERE id IN (?)";
+
+  db.query(sqlDelete, [req.body.selectedUsers], (err, result) => {
+    // Error handling
+    if (err) {
+      console.log(err);
+    }
+    res.send(result);
+  });
+});
+
+UsersRouter.post("/clients/add", (req, res) => {
+  console.log("UsersRouter/clients/add");
+  // Delete users rows according to the ids obtained in an array
+
+  console.log(req.body.values);
+
+  //Check if mail was not registered before
+  const sqlSelect = `SELECT * FROM users WHERE email = '${req.body.values.mail}'`;
+  db.query(sqlSelect, (err, result) => {
+    // Error handling
+    if (err) {
+      console.log(err);
+    }
+    if (result.length > 0) {
+      res.status(409);
+      res.send({ message: "Mail already registered" });
+    } else {
+      const sqlInsert = `INSERT INTO users (id, email, username, password, rol)
+      VALUES (NULL, '${req.body.values.mail}', '${req.body.values.username}', '${req.body.values.password}', 'client')`;
+      db.query(sqlInsert, (err, result) => {
+        // Error handling
+        if (err) {
+          console.log(err);
+        }
+        res.send(result);
+      });
+    }
+  });
+
+  // const sqlInsert = `INSERT INTO users (id, email, username, password, rol)
+  // VALUES (NULL, '${req.body.values.mail}', '${req.body.values.username}', '${req.body.values.password}', 'client')`;
+  // const sqlDelete = "DELETE FROM users WHERE id IN (?)";
+
+  // db.query(sqlDelete, [req.body.selectedUsers], (err, result) => {
+  //   // Error handling
+  //   if (err) {
+  //     console.log(err);
+  //   }
+  //   res.send(result);
+  // });
+});

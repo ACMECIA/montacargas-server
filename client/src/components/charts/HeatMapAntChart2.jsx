@@ -317,7 +317,7 @@ export function FormFilter({ width = "40%", formName, fetchData }) {
           sm: { span: 16, offset: 8 },
         }}
       >
-        <SubmitButton width={width} />
+        <SubmitButton width={width}> Actualizar </SubmitButton>
       </Form.Item>
     </Form>
   );
