@@ -1,18 +1,55 @@
-import { chart } from "highcharts";
-import React, { Fragment, useCallback, useMemo } from "react";
-import { useState, useEffect } from "react";
-import GeneralButton from "../GeneralButton";
-import SubmitButton from "../../charts/components/SubmitButton";
-import { Checkbox, ConfigProvider, Form, Input, Button } from "antd";
+import React, { Fragment, useEffect, useState } from "react";
+import { Form, Input, InputNumber, Popconfirm, Table, Typography } from "antd";
 import "../../../index.css";
+
+// const originData = [];
+// for (let i = 0; i < 5; i++) {
+//   originData.push({
+//     key: i.toString(),
+//     name: `Edward ${i}`,
+//     type: "status",
+//     value: `London Park no. ${i}`,
+//   });
+// }
+const EditableCell = ({
+  editing,
+  dataIndex,
+  title,
+  inputType,
+  record,
+  index,
+  children,
+  ...restProps
+}) => {
+  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  return (
+    <td {...restProps}>
+      {editing ? (
+        <Form.Item
+          name={dataIndex}
+          style={{
+            margin: 0,
+          }}
+          rules={[
+            {
+              required: true,
+              message: `Inserte un ${title}`,
+            },
+          ]}
+        >
+          {inputNode}
+        </Form.Item>
+      ) : (
+        children
+      )}
+    </td>
+  );
+};
 
 export default function GeneralSettings({ chartName, serverType, dataPath }) {
   const [isFetching, setIsFetching] = useState(false);
-  const [addUser, setAddUser] = useState(false);
-  const [deleteUser, setDeleteUser] = useState(false);
-
-  const [users, setUsers] = useState([]);
-
+  const [originData, setOriginData] = useState([]);
+  // let originData = [];
   const fetchData = () => {
     if (!isFetching) {
       setIsFetching(true);
@@ -20,7 +57,16 @@ export default function GeneralSettings({ chartName, serverType, dataPath }) {
         .then((res) => res.json())
         .then((data) => {
           console.log(data);
-          setUsers(data);
+          let array = data.map((element) => ({
+            key: element.id.toString(),
+            name: element.name,
+            type: element.type,
+            value: element.json,
+          }));
+          // Relizar lo mismo de arriba pero con el setOriginData
+          setOriginData(array);
+
+          // console.log("data nueva", originData);
           setIsFetching(false);
 
           // setPosts(data);
@@ -32,19 +78,19 @@ export default function GeneralSettings({ chartName, serverType, dataPath }) {
     }
   };
 
-  const fetchDelete = (selectedUsers) => {
+  const fetchEdit = (values) => {
     if (!isFetching) {
       setIsFetching(true);
-      fetch(`api/${serverType}/${dataPath}/delete`, {
+      fetch(`api/${serverType}/${dataPath}/edit`, {
         method: "POST",
-        body: JSON.stringify({ selectedUsers }),
+        body: JSON.stringify({ values }),
         headers: {
           "Content-Type": "application/json",
         },
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          // console.log("received", data);
           fetchData();
           setIsFetching(false);
 
@@ -57,32 +103,13 @@ export default function GeneralSettings({ chartName, serverType, dataPath }) {
     }
   };
 
-  const fetchAdd = async (values) => {
-    if (!isFetching) {
-      setIsFetching(true);
-      const res = await fetch(`api/${serverType}/${dataPath}/add`, {
-        method: "POST",
-        body: JSON.stringify({ values }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      if (data.message) {
-        alert(data.message);
-      }
-      if (res.ok) {
-        fetchData();
-        setIsFetching(false);
-        setAddUser(false);
-        setDeleteUser(false);
+  const onEdit = (values) => {
+    // setAddUser(false);
+    // setDeleteUser(false);
+    console.log(values);
 
-        // setPosts(data);
-      } else {
-        // console.log(err.message);
-        setIsFetching(false);
-      }
-    }
+    fetchEdit(values);
+    //Something else that updates the database
   };
 
   useEffect(() => {
@@ -90,232 +117,147 @@ export default function GeneralSettings({ chartName, serverType, dataPath }) {
     fetchData();
   }, []);
 
-  const onAdd = () => {
-    setAddUser(true);
-    setDeleteUser(false);
-  };
-
-  const onDel = () => {
-    setAddUser(false);
-    setDeleteUser(true);
-  };
-
-  const onCancel = () => {
-    setAddUser(false);
-    setDeleteUser(false);
-  };
-  const onSumbitDelete = (selectedUsers) => {
-    setAddUser(false);
-    setDeleteUser(false);
-    // console.log(selectedUsers);
-    fetchDelete(selectedUsers);
-    //Something else that updates the database
-  };
-
-  const onSumbitAdd = (values) => {
-    // setAddUser(false);
-    // setDeleteUser(false);
-    // console.log(values);
-
-    fetchAdd(values);
-    //Something else that updates the database
-  };
-
   return (
     <Fragment>
       <strong className="text-gray-700 font-medium">{chartName}</strong>
       <div className="overflow:hidden w-full h-full p-4">
-        {addUser ? (
-          <AddUser onCancel={onCancel} onSubmit={onSumbitAdd} />
-        ) : deleteUser ? (
-          <DeleteUser
-            users={users}
-            onCancel={onCancel}
-            onSubmit={onSumbitDelete}
-          />
-        ) : (
-          <UsersTable users={users} onAdd={onAdd} onDel={onDel} />
-        )}
+        <GeneralSettingsTable originData={originData} onEdit={onEdit} />
       </div>
     </Fragment>
   );
 }
 
-function UsersTable({ users, onAdd, onDel }) {
-  return (
-    <div className="mt-3">
-      <table className="w-full text-grey-700 border-x border-gray-200 rounded-sm">
-        <thead>
-          <tr>
-            <td>Emails</td>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((row) => (
-            <tr key={row.id}>
-              <td>{row.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+function GeneralSettingsTable({ originData, onEdit }) {
+  const [form] = Form.useForm();
+  const [data, setData] = useState([...originData]);
+  const [editingKey, setEditingKey] = useState("");
 
-      <div className="flex flex-row justify-center py-2 space-x-2">
-        <GeneralButton onClickFunction={onDel}>Eliminar </GeneralButton>
-        <GeneralButton onClickFunction={onAdd}>Añadir </GeneralButton>
-      </div>
-    </div>
-  );
-}
+  useEffect(() => {
+    // Ejecutar fetchData inicialmente
+    setData(originData);
+  }, [originData]);
 
-function AddUser({ onCancel, onSubmit }) {
-  // const onFinish = (values) => {
-  //   console.log("Success:", values);
-  // };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+  const isEditing = (record) => record.key === editingKey;
+  const edit = (record) => {
+    form.setFieldsValue({
+      name: "",
+      type: "",
+      value: "",
+      ...record,
+    });
+    setEditingKey(record.key);
   };
+  const cancel = () => {
+    setEditingKey("");
+  };
+  const save = async (key) => {
+    try {
+      const row = await form.validateFields();
 
-  return (
-    <div className="flex justify-center items-center">
-      <Form
-        name="basic"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        style={{
-          maxWidth: 500,
-        }}
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onSubmit}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-      >
-        <Form.Item
-          label="Correo"
-          name="mail"
-          rules={[
-            {
-              required: true,
-              message: "Ingrese el correo",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
+      const newData = [...data];
+      const index = newData.findIndex((item) => key === item.key);
+      if (index > -1) {
+        const item = newData[index];
 
-        <Form.Item
-          label="Username"
-          name="username"
-          rules={[
-            {
-              required: true,
-              message: "Ingrese un nombre de usuario",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Ingrese la contraseña",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          wrapperCol={{
-            offset: 8,
-            span: 16,
-          }}
-        >
-          <div className="flex flex-row justify-center py-2 space-x-2">
-            <GeneralButton
-              color="komatsu-blue-light"
-              width={"40%"}
-              onClickFunction={onCancel}
-            >
-              Cancelar
-            </GeneralButton>
-            <SubmitButton width="40%">Añadir</SubmitButton>
-          </div>
-        </Form.Item>
-      </Form>
-    </div>
-  );
-}
-
-function DeleteUser({ users, onCancel, onSubmit }) {
-  const [selectedUsers, setSelectedUsers] = useState([]);
-
-  const onCheckboxChange = useCallback(
-    (e) => {
-      // console.log(e.target["data-id"]);
-      e.target.checked
-        ? setSelectedUsers((oldData) => [...oldData, e.target["data-id"]])
-        : setSelectedUsers((oldData) =>
-            oldData.filter((id) => id !== e.target["data-id"])
-          );
+        newData.splice(index, 1, {
+          ...item,
+          ...row,
+        });
+        setData(newData);
+        setEditingKey("");
+      } else {
+        newData.push(row);
+        setData(newData);
+        setEditingKey("");
+      }
+      //Added
+      onEdit(newData[index]);
+    } catch (errInfo) {
+      console.log("Validate Failed:", errInfo);
+    }
+  };
+  const columns = [
+    {
+      title: "Tipo",
+      dataIndex: "type",
+      width: "20%",
+      editable: false,
     },
-    [setSelectedUsers]
-  );
+    {
+      title: "Nombre",
+      dataIndex: "name",
+      width: "20%",
+      editable: false,
+    },
 
-  const onSubmitClicked = useCallback(() => {
-    onSubmit(selectedUsers);
-  }, [onSubmit, selectedUsers]);
-
+    {
+      title: "Valor",
+      dataIndex: "value",
+      width: "35%",
+      editable: true,
+    },
+    {
+      title: "Edición",
+      dataIndex: "operation",
+      render: (_, record) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => save(record.key)}
+              style={{
+                marginRight: 8,
+              }}
+            >
+              Save
+            </Typography.Link>
+            <Popconfirm title="Cancelar?" onConfirm={cancel}>
+              <a>Cancel</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => edit(record)}
+          >
+            Edit
+          </Typography.Link>
+        );
+      },
+    },
+  ];
+  const mergedColumns = columns.map((col) => {
+    if (!col.editable) {
+      return col;
+    }
+    return {
+      ...col,
+      onCell: (record) => ({
+        record,
+        // inputType: col.dataIndex === "age" ? "number" : "text",
+        inputType: "text",
+        dataIndex: col.dataIndex,
+        title: col.title,
+        editing: isEditing(record),
+      }),
+    };
+  });
   return (
-    <div className="mt-3">
-      <table className="w-full text-grey-700 border-x border-gray-200 rounded-sm">
-        <thead>
-          <tr>
-            <td>Emails</td>
-            <td>Seleccionar</td>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((row) => (
-            <tr key={row.id}>
-              <td>{row.email}</td>
-              <td>
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: "#e74c4c",
-                    },
-                  }}
-                >
-                  <Checkbox onChange={onCheckboxChange} data-id={row.id} />
-                </ConfigProvider>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="flex flex-row justify-center py-2 space-x-2">
-        <GeneralButton
-          color="komatsu-blue-light"
-          // width={"50%"}
-          onClickFunction={onCancel}
-        >
-          Cancelar
-        </GeneralButton>
-        <GeneralButton onClickFunction={onSubmitClicked}>
-          Eliminar
-        </GeneralButton>
-      </div>
-    </div>
+    <Form form={form} component={false}>
+      <Table
+        components={{
+          body: {
+            cell: EditableCell,
+          },
+        }}
+        bordered
+        dataSource={data}
+        columns={mergedColumns}
+        rowClassName="editable-row"
+        pagination={{
+          onChange: cancel,
+        }}
+      />
+    </Form>
   );
 }

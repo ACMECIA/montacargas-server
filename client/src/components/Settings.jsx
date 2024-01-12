@@ -74,7 +74,13 @@ export function SettingsDisplay() {
           ></UserManagement>
         </Box>
 
-        <Box></Box>
+        <Box>
+          <GeneralSettings
+            chartName={"Ajustes generales"}
+            serverType={"settings"}
+            dataPath={"general"}
+          />
+        </Box>
       </div>
     </div>
   );

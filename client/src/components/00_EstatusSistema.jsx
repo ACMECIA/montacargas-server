@@ -14,6 +14,7 @@ export default function EstatusSistema() {
         <Box flex={3}>
           <DeviceDescription
             chartName={"Descripción del sistema"}
+            serverType={"settings"}
             dataPath={"status-desc"}
             dataRate={5000}
           />

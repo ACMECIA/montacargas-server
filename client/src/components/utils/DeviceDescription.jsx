@@ -3,9 +3,14 @@ import { useEffect } from "react";
 import { getHostPath } from "../../utils/host";
 import useLocalStorage from "use-local-storage";
 
-export default function Description({ chartName, dataPath, dataRate = 10000 }) {
+export default function Description({
+  chartName,
+  dataPath,
+  dataRate = 10000,
+  serverType,
+}) {
   const [status, setStatus] = useLocalStorage(`${dataPath}`, false);
-
+  const [description, setDescription] = useState([]); // [description, setDescription
   let isFetching = false;
 
   const fetchData = () => {
@@ -25,9 +30,29 @@ export default function Description({ chartName, dataPath, dataRate = 10000 }) {
     }
   };
 
+  const fetchDescription = () => {
+    // if (!isFetching) {
+    isFetching = true;
+    fetch(`/api/${serverType}/status`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("fetchDesc", data);
+        setDescription(data);
+
+        isFetching = false;
+      })
+      .catch((err) => {
+        console.log(err.message);
+        setStatus(false); // Valor por defecto
+        isFetching = false;
+      });
+    // }
+  };
+
   useEffect(() => {
     // Ejecutar fetchData inicialmente
     fetchData();
+    fetchDescription();
 
     // Configurar un intervalo para ejecutar fetchData cada 500 milisegundos
     const intervalId = setInterval(fetchData, dataRate);
@@ -43,34 +68,12 @@ export default function Description({ chartName, dataPath, dataRate = 10000 }) {
       <strong className="text-gray-700 font-medium">{chartName}</strong>
 
       <div className="mt-10  mx-20   items-justify flex flex-col">
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Equipo: </div>
-          <div className="flex flex-1 ">Montacargas</div>
-        </div>
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Marca: </div>
-          <div className="flex flex-1 ">TOYOTA 4.5 TN</div>
-        </div>
-
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Modelo: </div>
-          <div className="flex flex-1 ">02-7FG45 N/S</div>
-        </div>
-
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Bastidor: </div>
-          <div className="flex flex-1 ">A7FGA50-51912</div>
-        </div>
-
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Cod. Activo: </div>
-          <div className="flex flex-1 ">KM0061657</div>
-        </div>
-
-        <div className="flex flex-row my-5">
-          <div className="flex flex-1 mr-10">Tonelaje: </div>
-          <div className="flex flex-1 ">4.5</div>
-        </div>
+        {description.map((item, index) => (
+          <div className="flex flex-row my-5" key={index}>
+            <div className="flex flex-1 mr-10">{item.name}:</div>
+            <div className="flex flex-1 ">{item.json}</div>
+          </div>
+        ))}
 
         <div className="flex flex-row my-5">
           <div className="flex flex-1 mr-10">Estatus: </div>
