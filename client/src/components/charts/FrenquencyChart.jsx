@@ -30,12 +30,12 @@ function generateTrace(hours, month, fInit, fEnd, state, sw) {
   //   var colorT = "rgba(216,217,219,0.8)";
   //   var colorB = "rgba(98,106,106,1)";
   // }
-  if (state >= 3) {
+  if (Number(state) === 1) {
     var colorT = "rgba(14,18,113,0.8)";
     var colorB = "rgba(14,18,113,1)";
     var stateName = stateNames[0];
   }
-  if (state < 3) {
+  if (Number(state) === 0) {
     var colorT = "rgba(216,217,219,0.8)";
     var colorB = "rgba(98,106,106,1)";
     var stateName = stateNames[1];
@@ -88,7 +88,7 @@ function convertISOToReadableDateTime(isoDate) {
 
 //Initialize chart
 // const fecha = new Date();
-const mesActual = 9; //fecha.getMonth() + 1;
+const mesActual = 0; //fecha.getMonth() + 1;
 var mes_init = nombresMeses[mesActual];
 //traceInitM = generateTrace(0.0001, mes_init, '000/00/00 00:00', '0000/00/00 00:00', 'Mantenimiento',true)//'2022/11/24 10:50:16'
 var traceInitUE = generateTrace(
@@ -96,7 +96,7 @@ var traceInitUE = generateTrace(
   mes_init,
   "000/00/00 00:00",
   "0000/00/00 00:00",
-  5,
+  1,
   true
 );
 // var traceInitNU = generateTrace(

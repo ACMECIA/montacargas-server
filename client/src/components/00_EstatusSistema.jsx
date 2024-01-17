@@ -44,7 +44,7 @@ export default function EstatusSistema() {
             chartName={"Carga"}
             dataPath={"load"}
             dataRate={1000}
-            gaugeUnit="mA"
+            gaugeUnit="Tn"
             maxValue={10}
           />
         </Box>

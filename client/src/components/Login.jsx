@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-import loginImg from "../assets/login.jpg";
+import loginImg from "../assets/login.png";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -62,7 +62,7 @@ export default function Login() {
           className="max-w-[400px] w-full mx-auto rounded-lg bg-komatsu-blue p-8 px-8"
         >
           <h2 className="text-4xl dark:text-white font-bold text-center">
-            Login
+            Montacargas 4.0
           </h2>
           <div className="flex flex-col text-white py-2">
             <label>Email</label>

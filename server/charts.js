@@ -4,6 +4,12 @@ import bodyParser from "body-parser";
 
 import mysql from "mysql";
 
+import {
+  getStateInformation,
+  monthlyRepetitionState,
+  monthlyRepetitionStates,
+} from "./functions.js";
+
 const ChartsRouter = Router();
 
 // ChartsRouter.use(cors());
@@ -33,9 +39,11 @@ ChartsRouter.post("/realtime", (req, res) => {
   var dates = req.body.dateRange;
 
   // Get the data from the database with the time interval make the query
-  var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});
-  `;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]})
+  ORDER BY date;
+`;
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
@@ -267,12 +275,16 @@ ChartsRouter.post("/heat22", (req, res) => {
   });
 });
 
-ChartsRouter.get("/frequency", (req, res) => {
+ChartsRouter.get("/frequency2", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
 
   // Get the data from the database with the time interval make the query
-  var query = `SELECT data FROM local_data;`;
+  // var query = `SELECT data FROM local_data;`;
+  var query = `
+  SELECT * FROM local_data 
+  ORDER BY date;
+`;
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
@@ -336,62 +348,126 @@ ChartsRouter.get("/frequency", (req, res) => {
   });
 });
 
+ChartsRouter.get("/frequency", (req, res) => {
+  // Obtenemos el intervalo de data
+  // var dates = req.body.dateRange;
+
+  // Get the data from the database with the time interval make the query
+  // var query = `SELECT data FROM local_data;`;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE())
+  ORDER BY date;
+`;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+    // console.log(array_in);
+    var array_out = [];
+
+    array_out = getStateInformation(array_in);
+
+    // return res.json({ Status: "Success" });
+    return res.json({ Status: "Success", payload: array_out });
+  });
+});
+
 ChartsRouter.get("/cfrequency", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
 
   // Get the data from the database with the time interval make the query
-  var query = `SELECT data FROM local_data;`;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE());
+  `;
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
     var array_in = data.map((row) => JSON.parse(row.data));
     var array_out = [];
 
-    var count = 0;
-    var current_state = 0;
-    var prev_state = 0;
-    var current_date = 0;
-
-    for (var i = 0; i < array_in.length; i++) {
-      current_state = array_in[i].state;
-      current_date = array_in[i].timestamp;
-
-      if (current_state != prev_state) {
-        array_out[count] = {
-          state: current_state,
-          fInit: current_date,
-          fEnd: current_date,
-        };
-        count++;
-      } else {
-        array_out[count - 1].fEnd = current_date;
-      }
-      prev_state = current_state;
-    }
-
     var array1 = Array(12).fill(0);
     var array2 = Array(12).fill(0);
     var array3 = Array(12).fill(0);
 
-    for (var i = 0; i < array_out.length; i++) {
-      const diferenciaEnMilisegundos = array_out[i].fEnd - array_out[i].fInit;
-      const horas = diferenciaEnMilisegundos / (60 * 60 * 1000);
-      const porcentaje = (horas / 720) * 100; // 720 horas es el máximo de horas en un mes
+    array1 = monthlyRepetitionState(array_in, "gstate", 1);
+    array2 = monthlyRepetitionState(array_in, "state", 5);
 
-      var date = new Date(array_out[i].fInit);
-      var mes = date.getMonth();
-
-      if (array_out[i].state >= 3) {
-        array1[mes] += porcentaje;
-        if (array_out[i].state === 5) {
-          array2[mes] += porcentaje;
-        }
+    // Getting percentage
+    // period*repetitions*100/total_hours/3600
+    array1 = array1.map((value) => (500 * value) / 3600 / 220);
+    array2 = array2.map((value) => (500 * value) / 3600 / 220);
+    // Array3 is the division element by element of array2 and array1 (avoid zero division)
+    for (var i = 0; i < array1.length; i++) {
+      if (array1[i] != 0) {
+        array3[i] = (array2[i] / array1[i]) * 100;
+      } else {
+        array3[i] = 0;
       }
-      // Que array 3 sea la division de array 2 entre array 1 por cada elemento
-      array3[mes] = (array2[mes] / array1[mes]) * 100;
     }
+    // console.log(array1);
+    // console.log(array2);
+    // console.log(array3);
+
+    // array3[mes] = (array2[mes] / array1[mes]) * 100;
+
     return res.json({ Status: "Success", payload: { array1, array2, array3 } });
+  });
+});
+
+ChartsRouter.get("/stacked", (req, res) => {
+  // Obtenemos el intervalo de data
+  // var dates = req.body.dateRange;
+
+  // Get the data from the database with the time interval make the query
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE())
+  ORDER BY date;
+  `;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+
+    var array1 = Array(12).fill(0);
+    var array2 = Array(12).fill(0);
+    var array3 = Array(12).fill(0);
+    var array4 = Array(12).fill(0);
+    var array5 = Array(12).fill(0);
+    var array6 = Array(12).fill(0);
+
+    // array1 = monthlyRepetitionState(array_in, "state", 0);
+    // array2 = monthlyRepetitionState(array_in, "state", 1);
+    // array3 = monthlyRepetitionState(array_in, "state", 2);
+    // array4 = monthlyRepetitionState(array_in, "state", 3);
+    // array5 = monthlyRepetitionState(array_in, "state", 4);
+    // array6 = monthlyRepetitionState(array_in, "state", 5);
+
+    var allArrays = monthlyRepetitionStates(array_in);
+    array1 = allArrays[0];
+    array2 = allArrays[1];
+    array3 = allArrays[2];
+    array4 = allArrays[3];
+    array5 = allArrays[4];
+    array6 = allArrays[5];
+
+    // console.log(data_test);
+    // Getting hourse
+    // period*repetitions/3600
+    // array1 = array1.map((value) => (5 * value) / 3600);
+    // array2 = array2.map((value) => (5 * value) / 3600);
+    // array3 = array3.map((value) => (5 * value) / 3600);
+    // array4 = array4.map((value) => (5 * value) / 3600);
+    // array5 = array5.map((value) => (5 * value) / 3600);
+    // array6 = array6.map((value) => (5 * value) / 3600);
+
+    return res.json({
+      Status: "Success",
+      payload: { array1, array2, array3, array4, array5, array6 },
+    });
   });
 });
 

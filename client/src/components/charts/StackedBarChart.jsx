@@ -18,6 +18,9 @@ require("highcharts/modules/map")(Highcharts);
 const array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const array2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const array3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array4 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array5 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array6 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 export default function StackedBarChart({
   chartName,
@@ -32,6 +35,10 @@ export default function StackedBarChart({
   const [data1, setData1] = useState(array1);
   const [data2, setData2] = useState(array2);
   const [data3, setData3] = useState(array3);
+  const [data4, setData4] = useState(array4);
+  const [data5, setData5] = useState(array5);
+  const [data6, setData6] = useState(array6);
+
   const [isFetching, setIsFetching] = useState(false);
 
   const onClickFunction = () => {
@@ -49,6 +56,9 @@ export default function StackedBarChart({
           setData1(data.payload.array1);
           setData2(data.payload.array2);
           setData3(data.payload.array3);
+          setData4(data.payload.array4);
+          setData5(data.payload.array5);
+          setData6(data.payload.array6);
           setIsFetching(false);
 
           // setPosts(data);
@@ -131,7 +141,8 @@ export default function StackedBarChart({
 
     tooltip: {
       headerFormat: "<b>{point.x}</b><br/>",
-      pointFormat: "{series.name}: {point.y}<br/>Total: {point.stackTotal}",
+      pointFormat:
+        "{series.name}: {point.y:.2f}<br/>Total: {point.stackTotal:.2f}",
     },
     plotOptions: {
       column: {
@@ -144,32 +155,32 @@ export default function StackedBarChart({
     series: [
       {
         name: "Apagado",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5],
+        data: data1,
         color: "rgb(40,40,40)",
       },
       {
         name: "Inoperativo",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5],
+        data: data2,
         color: "rgb(120,120,120)",
       },
       {
         name: "Espera sin carga",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5],
+        data: data3,
         color: "rgb(170,170,170)",
       },
       {
         name: "Espera con carga",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 2, 5, 5],
+        data: data4,
         color: "rgb(142,202,230)",
       },
       {
         name: "Traslado sin carga",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5],
+        data: data5,
         color: "rgb(0,148,206)",
       },
       {
         name: "Efectivo",
-        data: [3, 5, 6, 4, 5, 5, 5, 5, 5, 5, 5, 5],
+        data: data6,
         color: "rgb(14,18,113)",
       },
     ],

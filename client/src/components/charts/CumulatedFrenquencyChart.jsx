@@ -198,20 +198,20 @@ export default function CumulatedFrequencyChart({
         // animation: false,
         name: "Frecuencia de uso",
         color: "rgb(14,18,113)",
-        data: data1t,
+        data: data1,
       },
       {
         // animation: false,
         name: "Frecuencia efectiva de uso ",
         color: "rgb(0,148,206)",
-        data: data2t,
+        data: data2,
       },
       {
         // animation: false,
         name: "Porcentaje efectivo ",
 
         color: "rgb(142,202,230)",
-        data: data3t,
+        data: data3,
         type: "line",
       },
     ],

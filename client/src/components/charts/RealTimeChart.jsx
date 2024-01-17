@@ -108,7 +108,7 @@ export default function RealTimeChart({
     series: [
       {
         animation: false,
-        name: "Corriente",
+        name: "Carga",
         color: "#66CC00",
         // showCheckbox: true,
         data: data1,
@@ -118,7 +118,7 @@ export default function RealTimeChart({
           valueDecimals: 2,
           pointFormat:
             '<span style="color:{point.color}">\u25CF</span> ' +
-            "{series.name}: <b>{point.y} mA</b><br/>",
+            "{series.name}: <b>{point.y} Tn</b><br/>",
         },
       },
       {

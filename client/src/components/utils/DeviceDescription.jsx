@@ -19,7 +19,8 @@ export default function Description({
       fetch(getHostPath(dataPath))
         .then((res) => res.json())
         .then((data) => {
-          setStatus(data.status);
+          console.log("data-status", data);
+          setStatus(data);
           isFetching = false;
         })
         .catch((err) => {
@@ -78,14 +79,14 @@ export default function Description({
         <div className="flex flex-row my-5">
           <div className="flex flex-1 mr-10">Estatus: </div>
           <div className={`flex flex-1  ${status ? "text-green-700" : ""}`}>
-            {status ? "Operando" : "Detenido"}
+            {status ? "Uso" : "No Uso"}
           </div>
         </div>
 
         <div className="flex flex-row my-5">
           <div className="flex flex-1 mr-10">Horómetro: </div>
           <div className="flex flex-1 text-komatsu-blue text-xl">
-            <Hourmeter dataRate={6000} dataPath={"hourmeter"} />
+            <Hourmeter dataRate={60000} dataPath={"hourmeter"} />
           </div>
         </div>
       </div>
