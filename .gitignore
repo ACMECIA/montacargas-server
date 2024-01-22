@@ -5,3 +5,4 @@ mariadb-data/*
 !mariadb-data/initdb.d
 .env
 .vscode
+*.docker
