@@ -29,16 +29,18 @@ export default function Mantenimiento() {
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
           <BarChart
-            dataPath={"bar"}
+            dataPath={"disponibilidad"}
             serverType={"charts"}
             chartName={"Disponibilidad"}
             varName={"Disponibilidad"}
+            yLabel={"Porcentaje (%)"}
+            units={"%"}
           />
         </Box>
 
         <Box>
           <BarChart2
-            dataPath={"bar1"}
+            dataPath={"detenciones"}
             serverType={"charts"}
             chartName={"Horas de detenciones"}
             labelName1={"Mantenimiento correctivo"}
@@ -50,10 +52,11 @@ export default function Mantenimiento() {
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
           <BarChart
-            dataPath={"bar1"}
+            dataPath={"confiabilidad"}
             serverType={"charts"}
             chartName={"Confiabilidad"}
             varName={"Confiabilidad"}
+            yLabel={"Confiabilidad"}
           />
         </Box>
 

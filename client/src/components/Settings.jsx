@@ -53,7 +53,11 @@ export function SettingsDisplay() {
     <div className="grid grid-cols-2 w-full gap-4 p-4">
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
-          <DeviceSchedule chartName={"Horario del Sistema"}></DeviceSchedule>
+          <DeviceSchedule
+            chartName={"Horario del Sistema"}
+            serverType={"settings"}
+            dataPath={"schedule"}
+          ></DeviceSchedule>
         </Box>
 
         <Box>

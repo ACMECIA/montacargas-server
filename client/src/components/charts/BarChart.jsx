@@ -17,7 +17,7 @@ require("highcharts/indicators/macd")(Highcharts);
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/map")(Highcharts);
 
-const array1 = [60, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 export default function BarChart({
   chartName,
@@ -25,6 +25,8 @@ export default function BarChart({
   dataRate,
   serverType,
   varName,
+  yLabel = "Porcentaje (%)",
+  units = "",
 }) {
   const [data1, setData1] = useLocalStorage(`${dataPath}`, array1);
 
@@ -102,7 +104,7 @@ export default function BarChart({
 
     yAxis: {
       title: {
-        text: "Porcentaje (%)",
+        text: yLabel,
       },
       // min: 0,
       // max: 100,
@@ -125,7 +127,7 @@ export default function BarChart({
         borderWidth: 0,
         dataLabels: {
           enabled: true,
-          format: "{point.y:.1f}%",
+          format: `{point.y:.2f}${units}`,
         },
         states: {
           inactive: {
@@ -144,7 +146,7 @@ export default function BarChart({
       headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
       pointFormat:
         '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-        '<td style="padding:0"><b>{point.y:.1f} %</b></td></tr>',
+        `<td style="padding:0"><b>{point.y:.2f} ${units}</b></td></tr>`,
       footerFormat: "</table>",
       shared: true,
       useHTML: true,

@@ -6,8 +6,9 @@ import mysql from "mysql";
 
 import {
   getStateInformation,
-  monthlyRepetitionState,
   monthlyRepetitionStates,
+  cumulatedMonthly,
+  cumulatedStateHours,
 } from "./functions.js";
 
 const ChartsRouter = Router();
@@ -64,46 +65,69 @@ ChartsRouter.post("/realtime", (req, res) => {
 ChartsRouter.post("/heat1", (req, res) => {
   var dates = req.body.filters.dateRange;
   var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
+    date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
 
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
     const gridSize = 100;
-    const grid = new Array(gridSize)
-      .fill()
-      .map(() => new Array(gridSize).fill(0));
+    const grid = Array.from({ length: gridSize }, () =>
+      Array.from({ length: gridSize }, () => ({ count: 0 }))
+    );
+    // Establecer límites de latitud y longitud (ejemplo)
+    const minLat = -12.0485;
+    const maxLat = -12.0468;
+    const minLng = -77.10137;
+    const maxLng = -77.10011;
+
+    const latStep = (maxLat - minLat) / gridSize;
+    const lngStep = (maxLng - minLng) / gridSize;
 
     data.forEach((row) => {
       var jsonData = JSON.parse(row.data);
-      const { x_axis, y_axis, carga1, z1_axis, state } = jsonData;
+
+      // Obtener la latitud y longitud de tus datos (ajustar según la estructura de tu JSON)
+      const lat = jsonData.latitude;
+      const lng = jsonData.longitude;
+      const carga = jsonData.carga;
+      const state = jsonData.state;
 
       const weightCheck =
         !req.body.filters.weightRange ||
-        (carga1 >= req.body.filters.weightRange[0] &&
-          carga1 <= req.body.filters.weightRange[1]);
-      const heightCheck =
-        !req.body.filters.heightRange ||
-        (z1_axis >= req.body.filters.heightRange[0] &&
-          z1_axis <= req.body.filters.heightRange[1]);
+        (carga >= req.body.filters.weightRange[0] &&
+          carga <= req.body.filters.weightRange[1]);
       const stateCheck =
         !req.body.filters.stateFilter || state === req.body.filters.stateFilter;
 
-      if (weightCheck && heightCheck && stateCheck) {
-        const withinBounds =
-          x_axis >= 0 && x_axis < gridSize && y_axis >= 0 && y_axis < gridSize;
-        if (withinBounds) {
-          grid[y_axis][x_axis]++;
+      // Calcular el índice en el grid para esta latitud y longitud
+      const latIndex = Math.floor((lat - minLat) / latStep);
+      const lngIndex = Math.floor((lng - minLng) / lngStep);
+
+      if (weightCheck && stateCheck) {
+        // Asegurarse de que el índice esté dentro de los límites del grid
+        if (
+          latIndex >= 0 &&
+          latIndex < gridSize &&
+          lngIndex >= 0 &&
+          lngIndex < gridSize
+        ) {
+          // Incrementar el contador en el grid para la celda correspondiente
+          grid[latIndex][lngIndex].count++;
         }
       }
     });
 
+    // console.log(grid);
+
     const heatmapJSON = [];
 
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        if (grid[y][x] > 0) {
-          heatmapJSON.push({ g: x, l: y, tmp: grid[y][x] });
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
+        const { count } = grid[y][x];
+        if (count > 0) {
+          heatmapJSON.push({ g: x, l: y, tmp: count });
+        } else {
+          heatmapJSON.push({ g: x, l: y, tmp: 0 });
         }
       }
     }
@@ -111,62 +135,10 @@ ChartsRouter.post("/heat1", (req, res) => {
     return res.json({ Status: "Success", payload: heatmapJSON });
   });
 });
-
-ChartsRouter.post("/heat2", (req, res) => {
-  var dates = req.body.filters.dateRange;
-  var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
-
-  db.query(query, (err, data) => {
-    if (err) return res.json({ Error: "Error in the query" });
-
-    const gridSize = 100;
-    const grid = new Array(gridSize)
-      .fill()
-      .map(() => new Array(gridSize).fill(0));
-
-    data.forEach((row) => {
-      var jsonData = JSON.parse(row.data);
-      const { x_axis, y_axis, carga2, z2_axis, state } = jsonData;
-
-      const weightCheck =
-        !req.body.filters.weightRange ||
-        (carga2 >= req.body.filters.weightRange[0] &&
-          carga2 <= req.body.filters.weightRange[1]);
-      const heightCheck =
-        !req.body.filters.heightRange ||
-        (z2_axis >= req.body.filters.heightRange[0] &&
-          z2_axis <= req.body.filters.heightRange[1]);
-      const stateCheck =
-        !req.body.filters.stateFilter || state === req.body.filters.stateFilter;
-
-      if (weightCheck && heightCheck && stateCheck) {
-        const withinBounds =
-          x_axis >= 0 && x_axis < gridSize && y_axis >= 0 && y_axis < gridSize;
-        if (withinBounds) {
-          grid[y_axis][x_axis]++;
-        }
-      }
-    });
-
-    const heatmapJSON = [];
-
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        if (grid[y][x] > 0) {
-          heatmapJSON.push({ g: x, l: y, tmp: grid[y][x] });
-        }
-      }
-    }
-
-    return res.json({ Status: "Success", payload: heatmapJSON });
-  });
-});
-
 ChartsRouter.post("/heat11", (req, res) => {
   var dates = req.body.filters.dateRange;
   var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
+    date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
 
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
@@ -176,39 +148,64 @@ ChartsRouter.post("/heat11", (req, res) => {
       Array.from({ length: gridSize }, () => ({ count: 0, total: 0 }))
     );
 
+    // Establecer límites de latitud y longitud (ejemplo)
+    const minLat = -12.0485;
+    const maxLat = -12.0468;
+    const minLng = -77.10137;
+    const maxLng = -77.10011;
+
+    const latStep = (maxLat - minLat) / gridSize;
+    const lngStep = (maxLng - minLng) / gridSize;
+
     data.forEach((row) => {
       var jsonData = JSON.parse(row.data);
-      const { x_axis, y_axis, carga1, z1_axis, state } = jsonData;
+
+      // Obtener la latitud y longitud de tus datos (ajustar según la estructura de tu JSON)
+      const lat = jsonData.latitude;
+      const lng = jsonData.longitude;
+      const carga = jsonData.carga;
+      const state = jsonData.state;
 
       const weightCheck =
         !req.body.filters.weightRange ||
-        (carga1 >= req.body.filters.weightRange[0] &&
-          carga1 <= req.body.filters.weightRange[1]);
-      const heightCheck =
-        !req.body.filters.heightRange ||
-        (z1_axis >= req.body.filters.heightRange[0] &&
-          z1_axis <= req.body.filters.heightRange[1]);
+        (carga >= req.body.filters.weightRange[0] &&
+          carga <= req.body.filters.weightRange[1]);
       const stateCheck =
         !req.body.filters.stateFilter || state === req.body.filters.stateFilter;
 
-      if (weightCheck && heightCheck && stateCheck) {
-        const withinBounds =
-          x_axis >= 0 && x_axis < gridSize && y_axis >= 0 && y_axis < gridSize;
-        if (withinBounds) {
-          grid[y_axis][x_axis].count++;
-          grid[y_axis][x_axis].total += carga1;
+      // Calcular el índice en el grid para esta latitud y longitud
+      const latIndex = Math.floor((lat - minLat) / latStep);
+      const lngIndex = Math.floor((lng - minLng) / lngStep);
+
+      if (weightCheck && stateCheck) {
+        // Asegurarse de que el índice esté dentro de los límites del grid
+        if (
+          latIndex >= 0 &&
+          latIndex < gridSize &&
+          lngIndex >= 0 &&
+          lngIndex < gridSize
+        ) {
+          // Acumular la suma de pesos y aumentar el contador
+          grid[latIndex][lngIndex].total += carga;
+          grid[latIndex][lngIndex].count++;
         }
       }
     });
 
+    // console.log(grid);
+
     const heatmapJSON = [];
 
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
+    for (let x = 0; x < gridSize; x++) {
+      for (let y = 0; y < gridSize; y++) {
         const { count, total } = grid[y][x];
         if (count > 0) {
+          // Calcular el promedio de pesos
           const average = total / count;
-          heatmapJSON.push({ g: x, l: y, tmp: average });
+          // Round to two decimals
+          const roundedAv = Math.round(average * 100) / 100;
+
+          heatmapJSON.push({ g: x, l: y, tmp: roundedAv });
         } else {
           heatmapJSON.push({ g: x, l: y, tmp: 0 });
         }
@@ -216,135 +213,6 @@ ChartsRouter.post("/heat11", (req, res) => {
     }
 
     return res.json({ Status: "Success", payload: heatmapJSON });
-  });
-});
-
-ChartsRouter.post("/heat22", (req, res) => {
-  var dates = req.body.filters.dateRange;
-  var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
-
-  db.query(query, (err, data) => {
-    if (err) return res.json({ Error: "Error in the query" });
-
-    const gridSize = 100;
-    const grid = Array.from({ length: gridSize }, () =>
-      Array.from({ length: gridSize }, () => ({ count: 0, total: 0 }))
-    );
-
-    data.forEach((row) => {
-      var jsonData = JSON.parse(row.data);
-      const { x_axis, y_axis, carga2, z2_axis, state } = jsonData;
-
-      const weightCheck =
-        !req.body.filters.weightRange ||
-        (carga2 >= req.body.filters.weightRange[0] &&
-          carga2 <= req.body.filters.weightRange[1]);
-      const heightCheck =
-        !req.body.filters.heightRange ||
-        (z2_axis >= req.body.filters.heightRange[0] &&
-          z2_axis <= req.body.filters.heightRange[1]);
-      const stateCheck =
-        !req.body.filters.stateFilter || state === req.body.filters.stateFilter;
-
-      if (weightCheck && heightCheck && stateCheck) {
-        const withinBounds =
-          x_axis >= 0 && x_axis < gridSize && y_axis >= 0 && y_axis < gridSize;
-        if (withinBounds) {
-          grid[y_axis][x_axis].count++;
-          grid[y_axis][x_axis].total += carga2;
-        }
-      }
-    });
-
-    const heatmapJSON = [];
-
-    for (let y = 0; y < gridSize; y++) {
-      for (let x = 0; x < gridSize; x++) {
-        const { count, total } = grid[y][x];
-        if (count > 0) {
-          const average = total / count;
-          heatmapJSON.push({ g: x, l: y, tmp: average });
-        } else {
-          heatmapJSON.push({ g: x, l: y, tmp: 0 });
-        }
-      }
-    }
-
-    return res.json({ Status: "Success", payload: heatmapJSON });
-  });
-});
-
-ChartsRouter.get("/frequency2", (req, res) => {
-  // Obtenemos el intervalo de data
-  // var dates = req.body.dateRange;
-
-  // Get the data from the database with the time interval make the query
-  // var query = `SELECT data FROM local_data;`;
-  var query = `
-  SELECT * FROM local_data 
-  ORDER BY date;
-`;
-  db.query(query, (err, data) => {
-    if (err) return res.json({ Error: "Error in the query" });
-
-    var array_in = data.map((row) => JSON.parse(row.data));
-    // console.log(array_in);
-    var array_out = [];
-
-    var count = 0;
-    var current_state = 0;
-    var prev_state = 0;
-    var current_date = 0;
-
-    for (var i = 0; i < array_in.length; i++) {
-      current_state = array_in[i].state;
-      current_date = array_in[i].timestamp;
-
-      if (current_state != prev_state) {
-        array_out[count] = {
-          state: current_state,
-          fInit: current_date,
-          fEnd: current_date,
-        };
-        count++;
-      } else {
-        if (array_out.length > 0) {
-          array_out[count - 1].fEnd = current_date;
-        } else {
-          // Handle the case where array_out is empty
-        }
-      }
-      prev_state = current_state;
-    }
-
-    var nombresMeses = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
-    ];
-
-    for (var i = 0; i < array_out.length; i++) {
-      const diferenciaEnMilisegundos = array_out[i].fEnd - array_out[i].fInit;
-      const horas = diferenciaEnMilisegundos / (60 * 60 * 1000);
-      array_out[i].hours = horas;
-
-      var date = new Date(array_out[i].fInit);
-      var mes = date.getMonth();
-      array_out[i].month = nombresMeses[mes];
-    }
-
-    // return res.json({ Status: "Success" });
-    return res.json({ Status: "Success", payload: array_out });
   });
 });
 
@@ -373,50 +241,79 @@ ChartsRouter.get("/frequency", (req, res) => {
   });
 });
 
+// ChartsRouter.get("/cfrequency", (req, res) => {
+//   // Obtenemos el intervalo de data
+//   // var dates = req.body.dateRange;
+
+//   // Get the data from the database with the time interval make the query
+//   var query = `
+//   SELECT * FROM local_data
+//   WHERE YEAR(date) = YEAR(CURDATE())
+//   order by date;
+//   `;
+//   db.query(query, (err, data) => {
+//     if (err) return res.json({ Error: "Error in the query" });
+
+//     var array_in = data.map((row) => JSON.parse(row.data));
+//     var array_out = [];
+
+//     var array1 = Array(12).fill(0);
+//     var array2 = Array(12).fill(0);
+//     var array3 = Array(12).fill(0);
+
+//     var maxHours = getMaxHours();
+//     console.log(maxHours);
+
+//     [array1, array2, array3] = cumulatedMonthly(array_in);
+
+//     return res.json({ Status: "Success", payload: { array1, array2, array3 } });
+//   });
+// });
+
 ChartsRouter.get("/cfrequency", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
 
-  // Get the data from the database with the time interval make the query
-  var query = `
-  SELECT * FROM local_data 
-  WHERE YEAR(date) = YEAR(CURDATE());
-  `;
-  db.query(query, (err, data) => {
-    if (err) return res.json({ Error: "Error in the query" });
+  // Get the schedule from the database
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'schedule'";
 
-    var array_in = data.map((row) => JSON.parse(row.data));
-    var array_out = [];
-
-    var array1 = Array(12).fill(0);
-    var array2 = Array(12).fill(0);
-    var array3 = Array(12).fill(0);
-
-    array1 = monthlyRepetitionState(array_in, "gstate", 1);
-    array2 = monthlyRepetitionState(array_in, "state", 5);
-
-    // Getting percentage
-    // period*repetitions*100/total_hours/3600
-    array1 = array1.map((value) => (500 * value) / 3600 / 220);
-    array2 = array2.map((value) => (500 * value) / 3600 / 220);
-    // Array3 is the division element by element of array2 and array1 (avoid zero division)
-    for (var i = 0; i < array1.length; i++) {
-      if (array1[i] != 0) {
-        array3[i] = (array2[i] / array1[i]) * 100;
-      } else {
-        array3[i] = 0;
-      }
+  db.query(sqlSelect, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.json({ Error: "Error in the query" });
     }
-    // console.log(array1);
-    // console.log(array2);
-    // console.log(array3);
 
-    // array3[mes] = (array2[mes] / array1[mes]) * 100;
+    let schedule = JSON.parse(result[0].json);
 
-    return res.json({ Status: "Success", payload: { array1, array2, array3 } });
+    let weekdays = schedule.weekdays;
+    let sumDays = weekdays.reduce((a, b) => a + b, 0);
+
+    let maxHours = 4 * sumDays * (schedule.endHour - schedule.initHour);
+
+    // Get the data from the database with the time interval make the query
+    var query = `
+    SELECT * FROM local_data 
+    WHERE YEAR(date) = YEAR(CURDATE())
+    order by date;
+    `;
+    db.query(query, (err, data) => {
+      if (err) return res.json({ Error: "Error in the query" });
+
+      var array_in = data.map((row) => JSON.parse(row.data));
+      var array_out = [];
+      var array1 = Array(12).fill(0);
+      var array2 = Array(12).fill(0);
+      var array3 = Array(12).fill(0);
+
+      [array1, array2, array3] = cumulatedMonthly(array_in, maxHours);
+
+      return res.json({
+        Status: "Success",
+        payload: { array1, array2, array3 },
+      });
+    });
   });
 });
-
 ChartsRouter.get("/stacked", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
@@ -439,13 +336,6 @@ ChartsRouter.get("/stacked", (req, res) => {
     var array5 = Array(12).fill(0);
     var array6 = Array(12).fill(0);
 
-    // array1 = monthlyRepetitionState(array_in, "state", 0);
-    // array2 = monthlyRepetitionState(array_in, "state", 1);
-    // array3 = monthlyRepetitionState(array_in, "state", 2);
-    // array4 = monthlyRepetitionState(array_in, "state", 3);
-    // array5 = monthlyRepetitionState(array_in, "state", 4);
-    // array6 = monthlyRepetitionState(array_in, "state", 5);
-
     var allArrays = monthlyRepetitionStates(array_in);
     array1 = allArrays[0];
     array2 = allArrays[1];
@@ -454,16 +344,6 @@ ChartsRouter.get("/stacked", (req, res) => {
     array5 = allArrays[4];
     array6 = allArrays[5];
 
-    // console.log(data_test);
-    // Getting hourse
-    // period*repetitions/3600
-    // array1 = array1.map((value) => (5 * value) / 3600);
-    // array2 = array2.map((value) => (5 * value) / 3600);
-    // array3 = array3.map((value) => (5 * value) / 3600);
-    // array4 = array4.map((value) => (5 * value) / 3600);
-    // array5 = array5.map((value) => (5 * value) / 3600);
-    // array6 = array6.map((value) => (5 * value) / 3600);
-
     return res.json({
       Status: "Success",
       payload: { array1, array2, array3, array4, array5, array6 },
@@ -471,7 +351,7 @@ ChartsRouter.get("/stacked", (req, res) => {
   });
 });
 
-ChartsRouter.post("/bell1", (req, res) => {
+ChartsRouter.post("/bell", (req, res) => {
   // Obtenemos el intervalo de data
   console.log(req.body);
   var dates = req.body.dateRange;
@@ -487,31 +367,114 @@ ChartsRouter.post("/bell1", (req, res) => {
     var array_out = [];
 
     for (var i = 0; i < array_in.length; i++) {
-      array_out[i] = array_in[i].carga1;
+      array_out[i] = array_in[i].carga;
     }
+
+    // Get mean of array_out
+    // var sum = 0;
+    // for (var i = 0; i < array_out.length; i++) {
+    //   sum += array_out[i];
+    // }
+    // var mean = sum / array_out.length;
+    // console.log(mean);
 
     return res.json({ Status: "Success", payload: array_out });
   });
 });
 
-ChartsRouter.post("/bell2", (req, res) => {
+ChartsRouter.get("/disponibilidad", (req, res) => {
   // Obtenemos el intervalo de data
-  var dates = req.body.dateRange;
+  // var dates = req.body.dateRange;
 
   // Get the data from the database with the time interval make the query
-  var query = `SELECT * FROM local_data WHERE 
-  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});
+  const maxHours = 220;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE())
+  order by date;
   `;
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
     var array_in = data.map((row) => JSON.parse(row.data));
-    var array_out = [];
 
-    for (var i = 0; i < array_in.length; i++) {
-      array_out[i] = array_in[i].carga2;
-    }
+    // Obtenermos el acumulado del estado 1, es decir inoperativo
+    var array1 = cumulatedStateHours(array_in, 1);
 
-    return res.json({ Status: "Success", payload: array_out });
+    // obtener la disponibilidad restando maxHours - array1 entre maxHours
+    // elementwise
+    array1 = array1.map((x) => (100 * (maxHours - x)) / maxHours);
+
+    return res.json({ Status: "Success", payload: { array1 } });
+  });
+});
+
+ChartsRouter.get("/confiabilidad", (req, res) => {
+  // Obtenemos el intervalo de data
+  // var dates = req.body.dateRange;
+
+  const euler = 2.71828;
+  // Get the data from the database with the time interval make the query
+  const maxHours = 220;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE())
+  order by date;
+  `;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    const maxHours = 220;
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+
+    var arrayCorrective = [5, 6, 7, 8, 4, 3, 6, 2, 4, 5, 0, 1];
+
+    // Obtenemos los tiempos de paradas
+    var paradasMensuales = cumulatedStateHours(array_in, 1);
+
+    // Asumamos que paradasMensuales es arrayCorrective*20
+    var paradasMensuales = arrayCorrective.map((x) => x * 20);
+
+    // Requerimos el tiempod e operacion por mes, que es maxHOurs - tiempo de paradas
+    var tiempoOperacion = paradasMensuales.map((x) => maxHours - x);
+
+    // Obtenemos el mtbf que es el tiempo de paradas entre el arrayCorrective, tener
+    //  en cuenta cuando arrayCorrective sea 0
+    var mtbf = tiempoOperacion.map((x, i) => x / arrayCorrective[i]);
+
+    //Finalmente la confiabilidad, que es euler**(-tiempoOperacion/mtbf)
+    var confiabilidad = tiempoOperacion.map((x, i) => euler ** (-x / mtbf[i]));
+
+    var array1 = confiabilidad;
+
+    return res.json({ Status: "Success", payload: { array1 } });
+  });
+});
+
+ChartsRouter.get("/detenciones", (req, res) => {
+  // Obtenemos el intervalo de data
+  // var dates = req.body.dateRange;
+
+  // Get the data from the database with the time interval make the query
+  const maxHours = 220;
+  var query = `
+  SELECT * FROM local_data 
+  WHERE YEAR(date) = YEAR(CURDATE())
+  order by date;
+  `;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+
+    // Obtenermos el acumulado del estado 1, es decir inoperativo
+    var array1 = cumulatedStateHours(array_in, 1);
+
+    // obtener la disponibilidad restando maxHours - array1 entre maxHours
+    // elementwise
+    array1 = array1.map((x) => (100 * (maxHours - x)) / maxHours);
+
+    return res.json({ Status: "Success", payload: { array1 } });
   });
 });

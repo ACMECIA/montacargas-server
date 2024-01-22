@@ -81,13 +81,17 @@ function getBellData(datos) {
 export default function BellChart({
   chartName,
   dataPath,
-  dataRate = 10000,
   serverType = "charts",
 }) {
   const { valoresX, valoresY } = getIdealData(100, 20);
 
   const [datax, setDataX] = useLocalStorage(`${dataPath}`, [0]);
   const [datay, setDataY] = useLocalStorage(`${dataPath}2`, [0]);
+
+  // Valores para la gráfica en Toneladas
+  const [lowerLimit, setLowerLimit] = useState(0);
+  const [upperLimit, setUpperLimit] = useState(1);
+  const [mean, setMean] = useState(0.5);
 
   // const [datax, setDataX] = useState([0]);
   // const [datay, setDataY] = useState([0]);
@@ -131,7 +135,9 @@ export default function BellChart({
       })
         .then((res) => res.json())
         .then((data) => {
-          const { valoresX, valoresY } = getBellData(data.payload);
+          // Divide data.payload elementwise by mean
+          const data2 = data.payload.map((item) => (100 * item) / mean);
+          const { valoresX, valoresY } = getBellData(data2);
           setDataX(valoresX);
           setDataY(valoresY);
           console.log(valoresX);
@@ -181,12 +187,12 @@ export default function BellChart({
         {
           color: "#FF0000", // Red
           width: 2,
-          value: 40, // Position, you'll have to translate this to the values on your x axis
+          value: (100 * lowerLimit) / mean, // Position, you'll have to translate this to the values on your x axis
         },
         {
           color: "#00FF00", // Red
           width: 2,
-          value: 150, // Position, you'll have to translate this to the values on your x axis
+          value: (100 * upperLimit) / mean, // Position, you'll have to translate this to the values on your x axis
         },
       ],
     },
@@ -212,11 +218,6 @@ export default function BellChart({
     },
 
     series: [
-      {
-        name: "Curva Ideal",
-        color: "rgb(14,18,113)",
-        data: valoresY.map((y, i) => [valoresX[i], y]),
-      },
       {
         name: "Curva Real",
         type: "area",

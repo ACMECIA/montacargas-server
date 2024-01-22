@@ -59,8 +59,9 @@ SettingsRouter.post("/general/edit", (req, res) => {
 
 SettingsRouter.get("/status", (req, res) => {
   console.log("SettingsRouter");
-  // Select data where type is status
-  const sqlSelect = "SELECT * FROM persistent_data WHERE type = 'status'";
+  // Select data where type is status and tag=='label'
+  const sqlSelect =
+    "SELECT * FROM persistent_data WHERE type = 'status' AND tag='label'";
   // return the result
   db.query(sqlSelect, (err, result) => {
     // Error handling
@@ -71,5 +72,41 @@ SettingsRouter.get("/status", (req, res) => {
     // res.send(result);
 
     // res.send("SettingsRouter");
+  });
+});
+
+SettingsRouter.get("/schedule", (req, res) => {
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'schedule'";
+
+  db.query(sqlSelect, (err, result) => {
+    // Error handling
+    if (err) {
+      console.log(err);
+    }
+
+    let data = JSON.parse(result[0].json);
+    console.log(data);
+    res.status(200).send(data);
+    // res.send(result);
+  });
+});
+SettingsRouter.post("/schedule/edit", (req, res) => {
+  console.log(req.body.values);
+
+  const json = JSON.stringify(req.body.values);
+
+  const sqlUpdate =
+    "UPDATE persistent_data SET json = ? WHERE tag = 'schedule'";
+
+  db.query(sqlUpdate, [json], (err, result) => {
+    //debug final query
+
+    // Error handling
+    if (err) {
+      console.log(err);
+    }
+
+    res.status(200).send(result);
+    // res.send(result);
   });
 });

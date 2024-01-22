@@ -15,88 +15,221 @@ var monthNames = [
 
 export function getStateInformation(arr) {
   let resultado = [];
-  let inicio = 0;
+  let rindex = 0;
 
-  for (let i = 1; i <= arr.length; i++) {
-    if (!arr[i] || arr[i].gstate !== arr[i - 1]?.gstate) {
-      const fin = i - 1;
-      const state = arr[inicio]?.gstate;
-      const repeticiones = fin - inicio + 1;
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    state: arr[0].gstate,
+    hours: 0,
+    month: monthNames[new Date(arr[0].timestamp).getMonth()],
+  };
+  rindex++;
 
-      // Verifica que existan los timestamps antes de crear los objetos Date
-      const fInit = arr[inicio]?.timestamp
-        ? new Date(arr[inicio].timestamp)
-        : null;
-      const fEnd = arr[fin]?.timestamp ? new Date(arr[fin].timestamp) : null;
+  for (let i = 1; i < arr.length; i++) {
+    // if (arr[i].gstate == -1) {
+    //   continue; // Ignorar intervalos con gstate igual a -1
+    // }
+    if (arr[i].gstate !== arr[i - 1].gstate) {
+      // Cada que hay un cambio declaramos el nuevo item
 
-      const hours = fInit && fEnd ? (fEnd - fInit) / (60 * 60 * 1000) : null;
-      const month = fInit ? monthNames[fInit.getMonth()] : null;
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        state: arr[i].gstate,
+        hours: 0,
+        month: monthNames[new Date(arr[i].timestamp).getMonth()],
+      };
 
-      resultado.push({
-        fInit,
-        fEnd,
-        repeticiones,
-        state,
-        month,
-        hours,
-      });
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
 
-      inicio = i;
+      rindex++;
     }
   }
 
+  // Itera en resultado y elimina donde haya gstate === -1
+  resultado = resultado.filter((item) => item.state !== -1);
   return resultado;
-}
-
-// Función para obtener un array con la cantidad de repeticiones por mes
-export function monthlyRepetitionState(data, attribute, estado) {
-  // Inicializar el array de resultados con 12 elementos, uno para cada mes
-  var repeticionesPorMes = new Array(12).fill(0);
-
-  // Iterar sobre cada objeto en el array de datos
-  data.forEach(function (item) {
-    // Verificar si el estado es igual al estado proporcionado como parámetro
-    if (Number(item[attribute]) === estado) {
-      // Obtener el objeto Date desde el timestamp
-      var fecha = new Date(item.timestamp);
-
-      // Obtener el mes (0-11) y actualizar el contador en el array de resultados
-      repeticionesPorMes[fecha.getMonth()]++;
-    }
-  });
-
-  return repeticionesPorMes;
 }
 
 export function monthlyRepetitionStates(arr) {
   // declara un array con 6 arrays dentro, uno para cada estado, con valores iniciales de 0
-  let repeticionesPorMes = new Array(6)
-    .fill(0)
-    .map(() => new Array(12).fill(0));
+  let horasPorMes = new Array(6).fill(0).map(() => new Array(12).fill(0));
+  let resultado = [];
+  let rindex = 0;
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    state: arr[0].state,
+    hours: 0,
+    month: monthNames[new Date(arr[0].timestamp).getMonth()],
+  };
+  rindex++;
 
-  let inicio = 0;
+  for (let i = 1; i < arr.length; i++) {
+    // if (arr[i].state == -1) {
+    //   continue; // Ignorar intervalos con state igual a -1
+    // }
+    if (arr[i].state !== arr[i - 1].state) {
+      // Cada que hay un cambio declaramos el nuevo item
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        state: arr[i].state,
+        hours: 0,
+        month: new Date(arr[i].timestamp).getMonth(),
+      };
 
-  for (let i = 1; i <= arr.length; i++) {
-    if (!arr[i] || arr[i].state !== arr[i - 1]?.state) {
-      const fin = i - 1;
-      const state = arr[inicio]?.state;
-      // const repeticiones = fin - inicio + 1;
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
 
-      // Verifica que existan los timestamps antes de crear los objetos Date
-      const fInit = arr[inicio]?.timestamp
-        ? new Date(arr[inicio].timestamp)
-        : null;
-      const fEnd = arr[fin]?.timestamp ? new Date(arr[fin].timestamp) : null;
+      // Actualizamos las horas acumuladas
 
-      const hours = fInit && fEnd ? (fEnd - fInit) / (60 * 60 * 1000) : null;
-      // const month = fInit ? monthNames[fInit.getMonth()] : null;
+      if (resultado[rindex - 1].state !== -1) {
+        horasPorMes[resultado[rindex - 1].state][resultado[rindex - 1].month] +=
+          resultado[rindex - 1].hours;
+      }
+      // console.log(horasPorMes);
+      rindex++;
+    }
+  }
+  // Filtra donde state sea -1
+  return horasPorMes;
+}
 
-      // add hours to state and month
-      repeticionesPorMes[state][fInit.getMonth()] += hours;
+export function cumulatedMonthly(arr, maxHours = 220) {
+  // declara un array con 6 arrays dentro, uno para cada estado, con valores iniciales de 0
+  let horasPorMes = new Array(6).fill(0).map(() => new Array(12).fill(0));
+  let resultado = [];
+  let rindex = 0;
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    state: arr[0].state,
+    hours: 0,
+    month: new Date(arr[0].timestamp).getMonth(),
+  };
+  rindex++;
 
-      inicio = i;
+  let array1 = new Array(12);
+  let array2 = new Array(12);
+  let array3 = new Array(12);
+
+  for (let i = 1; i < arr.length; i++) {
+    // if (arr[i].state == -1) {
+    //   continue; // Ignorar intervalos con state igual a -1
+    // }
+    if (arr[i].state !== arr[i - 1].state) {
+      // Cada que hay un cambio declaramos el nuevo item
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        state: arr[i].state,
+        hours: 0,
+        month: new Date(arr[i].timestamp).getMonth(),
+      };
+
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
+
+      // Actualizamos las horas acumuladas
+      if (resultado[rindex - 1].state !== -1) {
+        horasPorMes[resultado[rindex - 1].state][resultado[rindex - 1].month] +=
+          resultado[rindex - 1].hours;
+      }
+
+      // console.log(horasPorMes);
+      rindex++;
+    }
+  }
+  // Sum the three last arrays on array1 and get the percent with respect to maxHours elementwise
+  array1 = horasPorMes[3].map((x, i) => {
+    return (100 * (x + horasPorMes[4][i] + horasPorMes[5][i])) / maxHours;
+  });
+
+  // console.log(horasPorMes);
+  // Array2 is the last array and get the percent with respect to maxHours elementwise
+  array2 = horasPorMes[5].map((x) => (100 * x) / maxHours);
+
+  // array3 is the division of array2 / array1 elementwise
+  array3 = array2.map((x, i) => (100 * x) / array1[i]);
+
+  // return the three arrays
+  return [array1, array2, array3];
+}
+
+export function cumulatedStateHours(arr, state) {
+  // declara un array con 6 arrays dentro, uno para cada estado, con valores iniciales de 0
+  let horasPorMes = new Array(6).fill(0).map(() => new Array(12).fill(0));
+  let resultado = [];
+  let rindex = 0;
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    state: arr[0].state,
+    hours: 0,
+    month: new Date(arr[0].timestamp).getMonth(),
+  };
+  rindex++;
+
+  let array1 = new Array(12);
+
+  for (let i = 1; i < arr.length; i++) {
+    // if (arr[i].state == -1) {
+    //   continue; // Ignorar intervalos con state igual a -1
+    // }
+    if (arr[i].state !== arr[i - 1].state) {
+      // Cada que hay un cambio declaramos el nuevo item
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        state: arr[i].state,
+        hours: 0,
+        month: new Date(arr[i].timestamp).getMonth(),
+      };
+
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
+
+      // Actualizamos las horas acumuladas
+      if (resultado[rindex - 1].state !== -1) {
+        horasPorMes[resultado[rindex - 1].state][resultado[rindex - 1].month] +=
+          resultado[rindex - 1].hours;
+      }
+
+      console.log(horasPorMes);
+      rindex++;
     }
   }
 
-  return repeticionesPorMes;
+  // Obtenemos el inoperativo
+  array1 = horasPorMes[state];
+
+  // return the three arrays
+  return array1;
+}
+
+export function countCorrectiveMaintenance(arr) {
+  return arr;
 }

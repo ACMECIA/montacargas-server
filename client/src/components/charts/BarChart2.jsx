@@ -18,8 +18,8 @@ require("highcharts/indicators/macd")(Highcharts);
 require("highcharts/modules/exporting")(Highcharts);
 require("highcharts/modules/map")(Highcharts);
 
-const array1 = [60, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-const array2 = [60, 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const array2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 export default function BarChart({
   chartName,

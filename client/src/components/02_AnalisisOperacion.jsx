@@ -23,7 +23,7 @@ export default function EstatusMensual2() {
   // }, []);
   return (
     <div className="grid grid-cols w-full gap-4 p-4">
-      <div className="col-span-1 flex flex-col gap-4">
+      <div className="col-span-1 flex flex-col gap-4 ">
         {/* 
       <div className="flex flex-col gap-4 px-4 py-4 ">
       <div className="flex flex-row gap-4 w-full"> */}
@@ -33,15 +33,25 @@ export default function EstatusMensual2() {
             chartName={"Heatmap 1 (Repeticiones)"}
             dataPath={"heat1"}
             dataRate={10000}
+            statusFilter={[
+              { value: 2, label: "En espera sin carga" },
+              { value: 3, label: "En espera con carga" },
+              { value: 4, label: "Traslado sin carga" },
+              { value: 5, label: "Uso efectivo" },
+            ]}
           />
         </Box>
 
         <Box>
           <HeatMapAntChart
             serverType={"charts"}
-            chartName={"Heatmap 1-1 (Promedio Peso)"}
+            chartName={"Heatmap 2 (Promedio de Pesos)"}
             dataPath={"heat11"}
             dataRate={10000}
+            statusFilter={[
+              { value: 3, label: "En espera con carga" },
+              { value: 5, label: "Uso efectivo" },
+            ]}
           />
         </Box>
       </div>

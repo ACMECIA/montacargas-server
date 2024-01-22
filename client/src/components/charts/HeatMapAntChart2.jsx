@@ -9,7 +9,7 @@ import DatePickerForm from "./components/DatePickerForm";
 import DatePickerComponent from "./components/DatePicker";
 import RefreshButton from "./components/RefreshButton";
 import SubmitButton from "./components/SubmitButton";
-import layoutImage from "../images/layout.jpg";
+import layoutImage from "../images/layout.png";
 
 import useLocalStorage from "use-local-storage";
 import { InputNumber, Space, Select } from "antd";
@@ -21,6 +21,10 @@ export default function HeatMapAntChart({
   dataPath,
   dataRate = 10000,
   serverType = "charts",
+  statusFilter = [
+    { value: "positivo", label: "Uso Efectivo" },
+    { value: "negativo", label: "Uso Complementario" },
+  ],
 }) {
   const [data, setData] = useLocalStorage(`${dataPath}`, []);
   // const [data, setData] = useState([]);
@@ -63,6 +67,7 @@ export default function HeatMapAntChart({
 
     const config = {
       data,
+      height: 800,
       //   label: {
       //     fill: 'black',
       //   },
@@ -83,11 +88,11 @@ export default function HeatMapAntChart({
       // },
       xAxis: {
         min: 0,
-        max: 75,
+        max: 100,
       },
       yAxis: {
         min: 0,
-        max: 38,
+        max: 100,
       },
 
       type: "density",
@@ -136,7 +141,11 @@ export default function HeatMapAntChart({
         </ResponsiveContainer>
       </div>
 
-      <FormFilter formName={dataPath} fetchData={fetchData} />
+      <FormFilter
+        formName={dataPath}
+        fetchData={fetchData}
+        statusFilter={statusFilter}
+      />
     </div>
   );
 }
@@ -195,27 +204,15 @@ export function NumberRange({ label1, label2, units, width, value, onChange }) {
 //   console.log(`selected ${value}`);
 // };
 
-export function SelectState({ label, width, value, onChange }) {
-  const handleChange = (val) => {
-    let current = value ? [...value] : "";
-    current = val;
-    onChange(current);
-  };
-
-  return (
-    <Select
-      placeholder={label}
-      style={{ width: width }}
-      onChange={handleChange}
-      options={[
-        { value: "positivo", label: "Uso Efectivo" },
-        { value: "negativo", label: "Uso Complementario" },
-      ]}
-    />
-  );
-}
-
-export function FormFilter({ width = "40%", formName, fetchData }) {
+export function FormFilter({
+  width = "40%",
+  formName,
+  fetchData,
+  statusFilter = [
+    { value: "positivo", label: "Us22o Efectivo" },
+    { value: "negativo", label: "Uso Complementario" },
+  ],
+}) {
   const formItemLayout = {
     labelCol: {
       xs: {
@@ -262,7 +259,6 @@ export function FormFilter({ width = "40%", formName, fetchData }) {
         Math.round(item.valueOf() / 1000)
       ),
       weightRange: fieldsValue["weight-filter"],
-      heightRange: fieldsValue["height-filter"],
       stateFilter: fieldsValue["state-filter"],
     };
 
@@ -308,7 +304,11 @@ export function FormFilter({ width = "40%", formName, fetchData }) {
         label="Estado"
         // {...config}
       >
-        <SelectState label={"Seleccione el estado"} width={width} />
+        <SelectState
+          label={"Seleccione el estado"}
+          width={width}
+          statusFilter={statusFilter}
+        />
       </Form.Item>
 
       <Form.Item
@@ -320,5 +320,29 @@ export function FormFilter({ width = "40%", formName, fetchData }) {
         <SubmitButton width={width}> Actualizar </SubmitButton>
       </Form.Item>
     </Form>
+  );
+}
+
+export function SelectState({
+  label,
+  width,
+  onChange,
+  statusFilter = [
+    { value: "positivo", label: "Uso Efectivo" },
+    { value: "negativo", label: "Uso Complementario" },
+  ],
+}) {
+  const handleChange = (val) => {
+    let current = val;
+    onChange(current);
+  };
+
+  return (
+    <Select
+      placeholder={label}
+      style={{ width: width }}
+      onChange={handleChange}
+      options={statusFilter}
+    />
   );
 }
