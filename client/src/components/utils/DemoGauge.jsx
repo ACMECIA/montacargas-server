@@ -12,6 +12,8 @@ export default function DemoGauge({
   dataRate = 10000,
   gaugeUnit = "%",
   maxValue = 1,
+  gaugeColors = ["#30BF78", "#FAAD14", "#F4664A"],
+  gaugeTicks = [0, 1 / 3, 2 / 3, 1],
 }) {
   const [data, setData] = useLocalStorage(`${dataPath}`, 0);
   const [dateRange, setDates] = useState([]);
@@ -58,8 +60,8 @@ export default function DemoGauge({
   const config = {
     percent: data,
     range: {
-      ticks: [0, 1 / 3, 2 / 3, 1],
-      color: ["#30BF78", "#FAAD14", "#F4664A"],
+      ticks: gaugeTicks,
+      color: gaugeColors,
     },
     axis: {
       label: {

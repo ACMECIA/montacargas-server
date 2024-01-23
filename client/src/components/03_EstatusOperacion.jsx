@@ -7,6 +7,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DoubleBellChart from "./charts/DoubleBellChart";
+import HistogramChart from "./charts/HistogramChart";
 
 export default function EstatusOperacion() {
   // const [name, setName] = useState("");
@@ -42,12 +43,20 @@ export default function EstatusOperacion() {
           <DownloadData dataPath={"download"} serverType={"utils"} />
           <GeneralReport dataPath={"download"} serverType={"utils"} />
         </Box>
-        <Box>
+        {/* <Box>
           <DoubleBellChart
             dataPath={"bell"}
             serverType={"charts"}
             chartName={"Campana de Gauss"}
           />
+        </Box> */}
+        <Box>
+          <HistogramChart
+            dataPath={"histogram"}
+            serverType={"charts"}
+            chartName={"Histograma de cargas"}
+            binWidth={0.1}
+          ></HistogramChart>
         </Box>
       </div>
 

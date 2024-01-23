@@ -9,6 +9,7 @@ import RefreshButton from "./components/RefreshButton";
 
 import { getHostPath } from "../../utils/host";
 import useLocalStorage from "use-local-storage";
+import { websiteColors } from "../lib/utils/colors";
 
 // Load Highcharts modules
 require("highcharts/indicators/indicators")(Highcharts);
@@ -175,7 +176,7 @@ export default function BarChart({
       {
         animation: false,
         name: `${varName}`,
-        color: "rgb(14,18,113)",
+        color: `${websiteColors["komatsu-blue"]}`,
         data: data1,
       },
     ],

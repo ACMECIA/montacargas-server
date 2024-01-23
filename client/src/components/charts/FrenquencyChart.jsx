@@ -7,6 +7,7 @@ import RefreshButton from "./components/RefreshButton";
 import { ResponsiveContainer } from "recharts";
 // import useSessionStorage from "react-use-sessionstorage";
 import useLocalStorage from "use-local-storage";
+import { websiteColors } from "../lib/utils/colors";
 
 var nombresMeses = [
   "Enero",
@@ -30,15 +31,19 @@ function generateTrace(hours, month, fInit, fEnd, state, sw) {
   //   var colorT = "rgba(216,217,219,0.8)";
   //   var colorB = "rgba(98,106,106,1)";
   // }
+  var colorT = websiteColors["komatsu-blue-a"];
+  var colorB = websiteColors["komatsu-blue-a"];
+  var stateName = stateNames[0];
+
   if (Number(state) === 1) {
-    var colorT = "rgba(14,18,113,0.8)";
-    var colorB = "rgba(14,18,113,1)";
-    var stateName = stateNames[0];
+    colorT = websiteColors["komatsu-blue-a"];
+    colorB = websiteColors["komatsu-blue"];
+    stateName = stateNames[0];
   }
   if (Number(state) === 0) {
-    var colorT = "rgba(216,217,219,0.8)";
-    var colorB = "rgba(98,106,106,1)";
-    var stateName = stateNames[1];
+    colorT = websiteColors["komatsu-gray-a"];
+    colorB = "rgba(200,200,200,1)";
+    stateName = stateNames[1];
   }
   //if (state =='Mantenimiento'){ var colorT = 'rgba(255,20,51,0.8)'; var colorB = 'rgba(255,20,51,1)';}
 

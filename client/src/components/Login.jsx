@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
 import loginImg from "../assets/login.png";
+import logoKrcp from "../assets/logo_krcp.png";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -53,16 +54,20 @@ export default function Login() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 h-screen w-full">
       <div className="hidden sm:block">
-        <img className="w-full h-full object-cover" src={loginImg} alt="" />
+        <img className="w-90 h-full object-cover" src={loginImg} alt="" />
       </div>
 
-      <div className="bg-komatsu-blue-light flex flex-col justify-center">
+      <div className="bg-komatsu-blue flex flex-col w-85 ml-60">
+        <div>
+          <img className="w-56 px-5 py-5" src={logoKrcp} alt="" />
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="max-w-[400px] w-full mx-auto rounded-lg bg-komatsu-blue p-8 px-8"
         >
-          <h2 className="text-4xl dark:text-white font-bold text-center">
-            Montacargas 4.0
+          <h2 className="text-xl text-white font-bold text-center">
+            Montacarga 4.0
           </h2>
           <div className="flex flex-col text-white py-2">
             <label>Email</label>
@@ -91,7 +96,7 @@ export default function Login() {
           {/* <Link to={"/"}> */}
           <button
             type="submit"
-            className="w-full my-5 py-2 bg-komatsu-blue-light hover:shadow-lg text-white font-semibold rounded-lg"
+            className="w-full my-5 py-2 bg-komatsu-gray hover:shadow-lg text-black font-semibold rounded-lg"
           >
             LOGIN
           </button>

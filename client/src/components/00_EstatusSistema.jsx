@@ -36,6 +36,8 @@ export default function EstatusSistema() {
             dataRate={1000}
             gaugeUnit="km/h"
             maxValue={20}
+            gaugeColors={["#30BF78", "#FAAD14", "#F4664A"]}
+            gaugeTicks={[0, 1 / 2, 3 / 4, 1]}
           />
         </Box>
 
@@ -45,7 +47,9 @@ export default function EstatusSistema() {
             dataPath={"load"}
             dataRate={1000}
             gaugeUnit="Tn"
-            maxValue={10}
+            maxValue={5}
+            gaugeColors={["#FAAD14", "#30BF78", "#F4664A"]}
+            gaugeTicks={[0, 1 / 2, 4.5 / 5, 1]}
           />
         </Box>
       </div>

@@ -15,7 +15,7 @@ export default function GeneralButton({
         theme={{
           token: {
             // Seed Token
-            colorPrimary: websiteColors[`${color}`],
+            colorPrimary: websiteColors["komatsu-blue-h"],
           },
         }}
       >

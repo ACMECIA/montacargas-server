@@ -6,7 +6,7 @@ import {
 import { NavLink as Link, useLocation } from "react-router-dom";
 import classNames from "classnames";
 import { HiOutlineLogout } from "react-icons/hi";
-import logoUrl from "./images/logo.bmp";
+import logoUrl from "./images/logo_krcp.png";
 import axios from "axios";
 const linkClasses =
   "flex items-center gap-2 font-light px-3 py-2 hover:bg-komatsu-blue-light no-underline hover:no-underline active:bg-komatsu-blue-light rounded-sm text-base text-decoration-none";

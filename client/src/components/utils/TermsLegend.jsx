@@ -6,7 +6,7 @@ export default function TermsLegend({ chartName }) {
       <strong className="text-gray-700 font-medium">{chartName}</strong>
 
       <div className="mt-5 mx-2 items-justify flex flex-col text-sm">
-        <p className="mb-0.5 text-xs">
+        <p className="mb-1 text-xs">
           <strong>Apagado:</strong> Se considera cuando el montacarga esta
           apagado (Señal de encendido apagada).
         </p>

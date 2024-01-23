@@ -1,8 +1,8 @@
 import { Button } from "antd";
 import React, { Fragment } from "react";
 import { ConfigProvider } from "antd";
-import { getHostPath } from "../../../utils/host";
 import { useState } from "react";
+import { websiteColors } from "../../lib/utils/colors";
 
 function downloadCSV(csv, filename) {
   var csvFile;
@@ -20,7 +20,12 @@ function downloadCSV(csv, filename) {
   document.body.removeChild(downloadLink);
 }
 
-export default function DownloadButton({ dataPath, dateRange, width = "15%", serverType = "charts" }) {
+export default function DownloadButton({
+  dataPath,
+  dateRange,
+  width = "15%",
+  serverType = "charts",
+}) {
   const [isFetching, setIsFetching] = useState(false);
 
   const fetchData = () => {
@@ -67,7 +72,7 @@ export default function DownloadButton({ dataPath, dateRange, width = "15%", ser
         theme={{
           token: {
             // Seed Token
-            colorPrimary: "#0e1171",
+            colorPrimary: websiteColors["komatsu-blue-h"],
           },
         }}
       >

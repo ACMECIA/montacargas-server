@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        "komatsu-blue": "#0e1171",
+        "komatsu-blue": "#00348D",
         "komatsu-gray": "#ebebeb",
         "komatsu-blue-light": "#0077a6",
       },

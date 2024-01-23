@@ -1,6 +1,7 @@
 import { Button } from "antd";
 import React, { Fragment } from "react";
 import { ConfigProvider } from "antd";
+import { websiteColors } from "../../lib/utils/colors";
 
 export default function RefreshButton({ children, width = "20%" }) {
   return (
@@ -9,7 +10,7 @@ export default function RefreshButton({ children, width = "20%" }) {
         theme={{
           token: {
             // Seed Token
-            colorPrimary: "#0e1171",
+            colorPrimary: websiteColors["komatsu-blue-h"],
           },
         }}
       >

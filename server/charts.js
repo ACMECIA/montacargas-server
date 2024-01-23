@@ -382,6 +382,37 @@ ChartsRouter.post("/bell", (req, res) => {
   });
 });
 
+ChartsRouter.post("/histogram", (req, res) => {
+  // Obtenemos el intervalo de data
+  console.log(req.body);
+  var dates = req.body.dateRange;
+
+  // Get the data from the database with the time interval make the query
+  var query = `SELECT * FROM local_data WHERE 
+  date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});
+  `;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+    var array_out = [];
+
+    for (var i = 0; i < array_in.length; i++) {
+      array_out[i] = array_in[i];
+    }
+
+    // Get mean of array_out
+    // var sum = 0;
+    // for (var i = 0; i < array_out.length; i++) {
+    //   sum += array_out[i];
+    // }
+    // var mean = sum / array_out.length;
+    // console.log(mean);
+
+    return res.json({ Status: "Success", payload: array_out });
+  });
+});
+
 ChartsRouter.get("/disponibilidad", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
