@@ -69,17 +69,27 @@ function Map({ position = [-12.142218, -76.99065] }) {
   });
   return (
     <MapContainer
+      style={{
+        width: "100%",
+        height: "100%",
+        maxHeight: "none",
+        maxWidth: "none",
+        zIndex: 10,
+        position: "absolute",
+        top: 0,
+        left: 0,
+      }}
       center={[-12.0472533, -77.1002881]}
       zoom={18}
       scrollWheelZoom={true}
-      className={"w-full h-full"}
+      className="w-full h-full"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Marker position={position} icon={iconMap}>
-        <Popup>Montacargas</Popup>
+        <Popup>Montacarga</Popup>
       </Marker>
     </MapContainer>
   );

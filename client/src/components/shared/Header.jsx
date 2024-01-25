@@ -12,12 +12,24 @@ import { useNavigate } from "react-router-dom";
 import Clock from "../utils/Clock";
 import { BiSolidUser } from "react-icons/bi";
 import { GoAlert } from "react-icons/go";
+import { useState } from "react";
 
 export default function Header() {
   const navigate = useNavigate();
+  const [weekdays, setWeekdays] = useState([1, 1, 1, 1, 1, 1, 1]);
+  const [initHour, setInitHour] = useState(6);
+  const [endHour, setEndHour] = useState(18);
 
   return (
     <div className="bg-komatsu-gray h-16 px-4 flex justify-between items-center border-b border-gray-200">
+      <div>
+        <CurrentSchedule
+          weekdays={weekdays}
+          initHour={initHour}
+          endHour={endHour}
+        />
+      </div>
+
       <div>
         <Clock />
       </div>
@@ -167,5 +179,34 @@ export default function Header() {
         </Menu> */}
       </div>
     </div>
+  );
+}
+
+function CurrentSchedule({ weekdays, initHour, endHour }) {
+  const days = ["D", "L", "M", "M", "J", "V", "S"];
+
+  return (
+    <Fragment>
+      <div className="pb-1 flex">
+        <div className="flex justify-center gap-4">
+          <ul className="flex flex-row justify-center gap-4 list-none flex-wrap">
+            {days.map((day, index) => (
+              <li
+                key={index}
+                className={`w-9 h-9 flex items-center justify-center rounded-full select-none ${
+                  weekdays[index] ? "bg-komatsu-blue text-white" : "bg-white"
+                }`}
+              >
+                {day}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex justify-center pt-7 pl-5">
+          Horario: {initHour}:00 - {endHour}:30
+        </div>
+      </div>
+    </Fragment>
   );
 }

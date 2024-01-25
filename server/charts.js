@@ -77,8 +77,8 @@ ChartsRouter.post("/heat1", (req, res) => {
     // Establecer límites de latitud y longitud (ejemplo)
     const minLat = -12.0485;
     const maxLat = -12.0468;
-    const minLng = -77.10137;
-    const maxLng = -77.10011;
+    const minLng = -77.1018;
+    const maxLng = -77.1;
 
     const latStep = (maxLat - minLat) / gridSize;
     const lngStep = (maxLng - minLng) / gridSize;
@@ -151,8 +151,8 @@ ChartsRouter.post("/heat11", (req, res) => {
     // Establecer límites de latitud y longitud (ejemplo)
     const minLat = -12.0485;
     const maxLat = -12.0468;
-    const minLng = -77.10137;
-    const maxLng = -77.10011;
+    const minLng = -77.1018;
+    const maxLng = -77.1;
 
     const latStep = (maxLat - minLat) / gridSize;
     const lngStep = (maxLng - minLng) / gridSize;

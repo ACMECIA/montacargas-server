@@ -9,7 +9,7 @@ import DatePickerForm from "./components/DatePickerForm";
 import DatePickerComponent from "./components/DatePicker";
 import RefreshButton from "./components/RefreshButton";
 import SubmitButton from "./components/SubmitButton";
-import layoutImage from "../images/layout.png";
+import layoutImage from "../images/layout2.png";
 
 import useLocalStorage from "use-local-storage";
 import { InputNumber, Space, Select } from "antd";
@@ -67,7 +67,7 @@ export default function HeatMapAntChart({
 
     const config = {
       data,
-      height: 800,
+      height: 700,
       //   label: {
       //     fill: 'black',
       //   },
