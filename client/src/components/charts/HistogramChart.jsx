@@ -87,6 +87,11 @@ export default function HistogramChart({
     binField: "carga",
     binWidth: binWidth,
     color: websiteColors["komatsu-blue"],
+
+    tooltip: {
+      showMarkers: false,
+      position: "top",
+    },
   };
   return (
     <Fragment>
