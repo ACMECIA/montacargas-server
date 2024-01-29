@@ -89,8 +89,15 @@ export default function HistogramChart({
     color: websiteColors["komatsu-blue"],
 
     tooltip: {
-      showMarkers: false,
-      position: "top",
+      formatter: (datum) => {
+        // Redondear los valores en el tooltip
+        const roundedCount = Math.round(datum.count * 100) / 100;
+
+        const roundedRange = datum.range.map(
+          (value) => Math.round(value * 100) / 100
+        );
+        return { name: "Cuenta", value: roundedCount, title: roundedRange };
+      },
     },
   };
   return (

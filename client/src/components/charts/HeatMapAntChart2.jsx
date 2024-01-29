@@ -9,7 +9,7 @@ import DatePickerForm from "./components/DatePickerForm";
 import DatePickerComponent from "./components/DatePicker";
 import RefreshButton from "./components/RefreshButton";
 import SubmitButton from "./components/SubmitButton";
-import layoutImage from "../images/layout2.png";
+import layoutImage from "../images/layout3.png";
 
 import useLocalStorage from "use-local-storage";
 import { InputNumber, Space, Select } from "antd";
