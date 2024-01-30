@@ -1,6 +1,9 @@
 import React from "react";
 import { Checkbox } from "antd";
 import { Select } from "antd";
+import useLocalStorage from "use-local-storage";
+import { useState } from "react";
+import { useEffect } from "react";
 
 // import getOrderStatus from "./lib/utils";
 const recentMaintenance = [
@@ -43,7 +46,41 @@ const recentMaintenance = [
   },
 ];
 
-export default function RecentOrders({ tableName }) {
+export default function AlertsTable({ tableName, serverType, dataPath }) {
+  const [data, setData] = useLocalStorage(`${dataPath}`, []);
+  // const [data, setData] = useState([]);
+
+  const [isFetching, setIsFetching] = useState(false);
+
+  // const [heatFilters, setHeatFilters] = useState({});
+
+  const fetchData = () => {
+    if (!isFetching) {
+      setIsFetching(true);
+      fetch(`api/${serverType}/${dataPath}`, {
+        method: "GET",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data.payload);
+          console.log(dataHandling(data.payload));
+          setData(dataHandling(data.payload));
+
+          setIsFetching(false);
+
+          // setPosts(data);
+        })
+        .catch((err) => {
+          console.log(err.message);
+          setIsFetching(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div className="bg-white px-4 pt-3 pb-4 rounded-sm border border-gray-200 flex-1">
       <strong className="text-gray-700 font-medium">{tableName}</strong>
@@ -63,9 +100,9 @@ export default function RecentOrders({ tableName }) {
             </tr>
           </thead>
           <tbody>
-            {recentMaintenance.map((row) => (
+            {data.map((row) => (
               <tr key={row.id}>
-                <td>{row.fecha}</td>
+                <td>{row.date}</td>
                 <td>{row.hora}</td>
                 <td>{row.tipo_alerta}</td>
                 <td>{row.cod_activo}</td>
@@ -102,3 +139,51 @@ function SelectState({ label, width, value, onChange }) {
     />
   );
 }
+
+function dataHandling(dataIn) {
+  const dataOut = dataIn.map((row) => ({
+    id: row.id,
+    // Get fecha from row.date (date is timestamp, and i need the date only)
+    date: convertISOToReadableDate(row.date),
+    hora: convertISOToReadableHour(row.date),
+    tipo_alerta: alertTypes[row.alert_type],
+    cod_activo: row.code_device,
+    horometro: row.hourmeter,
+    tonelaje: row.ton,
+    tipo_mantenimiento: row.mant_type,
+    checklist: row.checklist,
+    comentarios: row.comments,
+  }));
+
+  return dataOut;
+}
+
+function convertISOToReadableDate(timestamp) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  const dateStr = `${day}/${month}/${year}`;
+
+  return `${dateStr}`;
+}
+function convertISOToReadableHour(timestamp) {
+  const date = new Date(timestamp);
+
+  const hour = date.getHours();
+  const minutes = date.getMinutes();
+
+  const timeStr = `${hour}:${minutes}`;
+
+  return `${timeStr}`;
+}
+
+const alertTypes = [
+  "Batería baja",
+  "Mantenimiento - Inicio",
+  "Mantenimiento - Fin",
+  "Mantenimiento preventivo 250",
+  "Mantenimiento preventivo 500",
+  "Mantenimiento preventivo 750",
+];

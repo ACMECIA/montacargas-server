@@ -30,8 +30,8 @@ export default function Alertas() {
       <div className="flex flex-row gap-4 w-full">
         <Box>
           <AlertsTable
-            dataPath={"alerts"}
-            serverType={"utils"}
+            dataPath={"load"}
+            serverType={"alerts"}
             tableName={"Alertas"}
           />
         </Box>

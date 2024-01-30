@@ -4,6 +4,7 @@ import AuthRouter from "./auth.js";
 import UtilsRouter from "./utils.js";
 import UsersRouter from "./users.js";
 import SettingsRouter from "./settings.js";
+import AlertsRouter from "./alerts.js";
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.use("/api/utils", UtilsRouter);
 app.use("/api/users", UsersRouter);
 
 app.use("/api/settings", SettingsRouter);
+
+app.use("/api/alerts", AlertsRouter);
 
 app.listen(9000, () => {
   console.log("Server is running on port 9000");
