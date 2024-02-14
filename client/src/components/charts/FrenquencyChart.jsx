@@ -24,7 +24,7 @@ var nombresMeses = [
   "Diciembre",
 ];
 
-var stateNames = ["Uso", "No uso"];
+var stateNames = ["Encendido", "Apagado"];
 
 function generateTrace(hours, month, fInit, fEnd, state, sw) {
   // if (state == "init") {

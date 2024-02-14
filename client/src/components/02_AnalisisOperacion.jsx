@@ -33,11 +33,13 @@ export default function EstatusMensual2() {
             chartName={"Heatmap 1 (Repeticiones)"}
             dataPath={"heat1"}
             dataRate={10000}
+            heatColors="#F51D27-#FA541C-#FF8C12-#FFC838-#FAFFA8-#80FF73-#12CCCC-#1890FF"
             statusFilter={[
               { value: 2, label: "En espera sin carga" },
               { value: 3, label: "En espera con carga" },
               { value: 4, label: "Traslado sin carga" },
-              { value: 5, label: "Uso efectivo" },
+              { value: 5, label: "Traslado con carga" },
+              { value: 6, label: "Efectivo" },
             ]}
           />
         </Box>
@@ -48,9 +50,11 @@ export default function EstatusMensual2() {
             chartName={"Heatmap 2 (Promedio de Pesos)"}
             dataPath={"heat11"}
             dataRate={10000}
+            heatColors="#6E32C2-#1890FF-#12CCCC-#80FF73-#FAFFA8-#FFC838-#FF8C12-#FA541C-#F51D27"
             statusFilter={[
               { value: 3, label: "En espera con carga" },
-              { value: 5, label: "Uso efectivo" },
+              { value: 5, label: "Traslado con carga" },
+              { value: 6, label: "Efectivo" },
             ]}
           />
         </Box>

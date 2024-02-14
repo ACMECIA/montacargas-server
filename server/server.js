@@ -5,8 +5,15 @@ import UtilsRouter from "./utils.js";
 import UsersRouter from "./users.js";
 import SettingsRouter from "./settings.js";
 import AlertsRouter from "./alerts.js";
+import bodyParser from "body-parser";
 
 const app = express();
+
+// Para hacer la carpeta publica para react
+app.use(express.static("public"));
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use("/api/auth", AuthRouter);
 

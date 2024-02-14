@@ -9,6 +9,7 @@ import GeneralSettings from "./utils/settings/GeneralSettings";
 
 import DeviceSchedule from "./utils/settings/DeviceSchedule";
 import UserManagement from "./utils/settings/UserManagement";
+import HeatmapConfig from "./utils/settings/HeatmapSettings";
 
 export default function Settings() {
   const [rol, setRol] = useState("");
@@ -61,10 +62,10 @@ export function SettingsDisplay() {
         </Box>
 
         <Box>
-          <GeneralSettings
-            chartName={"Ajustes generales"}
+          <HeatmapConfig
+            chartName={"Configuración de Heatmap"}
             serverType={"settings"}
-            dataPath={"general"}
+            dataPath={"upload"}
           />
         </Box>
       </div>

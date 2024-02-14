@@ -4,6 +4,7 @@ import { Select } from "antd";
 import useLocalStorage from "use-local-storage";
 import { useState } from "react";
 import { useEffect } from "react";
+import { Input } from "antd";
 
 // import getOrderStatus from "./lib/utils";
 const recentMaintenance = [
@@ -47,8 +48,8 @@ const recentMaintenance = [
 ];
 
 export default function AlertsTable({ tableName, serverType, dataPath }) {
-  const [data, setData] = useLocalStorage(`${dataPath}`, []);
-  // const [data, setData] = useState([]);
+  // const [data, setData] = useLocalStorage(`${dataPath}`, []);
+  const [data, setData] = useState([]);
 
   const [isFetching, setIsFetching] = useState(false);
 
@@ -88,29 +89,29 @@ export default function AlertsTable({ tableName, serverType, dataPath }) {
         <table className="w-full text-grey-700 border-x border-gray-200 rounded-sm">
           <thead>
             <tr>
-              <td>Fecha</td>
-              <td>Hora</td>
-              <td>Tipo de Alerta</td>
-              <td>Cod. Activo</td>
-              <td>Horómetro</td>
-              <td>Tonelaje</td>
-              <td>Tipo de Mantenimiento</td>
-              <td>Checklist</td>
-              <td>Comentarios</td>
+              <td className="text-center">Fecha</td>
+              <td className="text-center">Hora</td>
+              <td className="text-center">Tipo de Alerta</td>
+              <td className="text-center">Cod. Activo</td>
+              <td className="text-center">Horómetro</td>
+              <td className="text-center">Tonelaje</td>
+              <td className="text-center">Tipo de Mantenimiento</td>
+              <td className="text-center">Comentarios</td>
+              <td className="text-center">Checklist</td>
             </tr>
           </thead>
           <tbody>
             {data.map((row) => (
               <tr key={row.id}>
-                <td>{row.date}</td>
-                <td>{row.hora}</td>
-                <td>{row.tipo_alerta}</td>
-                <td>{row.cod_activo}</td>
-                <td>{row.horometro}</td>
-                <td>{row.tonelaje}</td>
-                <td>{row.tipo_mantenimiento}</td>
-                <td>{row.checklist}</td>
-                <td>{row.comentarios}</td>
+                <td className="text-center">{row.date}</td>
+                <td className="text-center">{row.hora}</td>
+                <td className="text-center">{row.tipo_alerta}</td>
+                <td className="text-center">{row.cod_activo}</td>
+                <td className="text-center">{row.horometro}</td>
+                <td className="text-center">{row.tonelaje}</td>
+                <td className="text-center">{row.tipo_mantenimiento}</td>
+                <td className="text-center">{row.comentarios}</td>
+                <td className="text-center">{row.checklist}</td>
               </tr>
             ))}
           </tbody>
@@ -120,18 +121,23 @@ export default function AlertsTable({ tableName, serverType, dataPath }) {
   );
 }
 
-function SelectState({ label, width, value, onChange }) {
+function SelectState({ label, width, value, defaultValue, rowId, checkValue }) {
   const handleChange = (val) => {
     let current = value ? [...value] : "";
     current = val;
     // onChange(current);
+    handleMaintenanceTypeChange(current, rowId);
   };
 
   return (
     <Select
       placeholder={label}
+      defaultValue={defaultValue}
       style={{ width: width }}
+      disabled={checkValue}
       onChange={handleChange}
+      // onChange={(event) => handleMaintenanceTypeChange(event, rowId)}
+      // disabled={true}
       options={[
         { value: "correctivo", label: "Correctivo" },
         { value: "preventivo", label: "Preventivo" },
@@ -150,9 +156,19 @@ function dataHandling(dataIn) {
     cod_activo: row.code_device,
     horometro: row.hourmeter,
     tonelaje: row.ton,
-    tipo_mantenimiento: row.mant_type,
-    checklist: row.checklist,
-    comentarios: row.comments,
+    tipo_mantenimiento: handleMaintenanceType(
+      row.mant_type,
+      row.id,
+      row.checklist
+    ),
+    checklist: handleChecklist(row.checklist, row.mant_type, row.id),
+    comentarios: handleComments(
+      row.comments,
+      row.id,
+      row.mant_type,
+
+      row.checklist
+    ),
   }));
 
   return dataOut;
@@ -161,9 +177,16 @@ function dataHandling(dataIn) {
 function convertISOToReadableDate(timestamp) {
   const date = new Date(timestamp);
   const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
 
+  if (month < 10) {
+    month = "0" + month;
+  }
+
+  if (day < 10) {
+    day = "0" + day;
+  }
   const dateStr = `${day}/${month}/${year}`;
 
   return `${dateStr}`;
@@ -171,19 +194,150 @@ function convertISOToReadableDate(timestamp) {
 function convertISOToReadableHour(timestamp) {
   const date = new Date(timestamp);
 
-  const hour = date.getHours();
-  const minutes = date.getMinutes();
+  let hour = date.getHours();
+  let minutes = date.getMinutes();
 
+  if (hour < 10) {
+    hour = "0" + hour;
+  }
+
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
   const timeStr = `${hour}:${minutes}`;
 
   return `${timeStr}`;
+}
+
+function handleMaintenanceType(currentValue, rowId, checklist) {
+  let typesArray = ["preventivo", "correctivo"];
+  if (typesArray.includes(currentValue)) {
+    return (
+      <SelectState
+        label={"Tipo mantenimiento"}
+        defaultValue={currentValue}
+        checkValue={checklist}
+        rowId={rowId}
+      ></SelectState>
+    );
+  } else {
+    return;
+  }
+}
+
+function handleChecklist(checkValue, mantType, rowId) {
+  const onChange = (e) => {
+    console.log(`checked = ${e.target.checked}`);
+    checkValue = e.target.checked;
+    handleChecklistChange(e, rowId);
+  };
+
+  if (mantType === "mant-end") {
+    return;
+  } else {
+    return (
+      <Checkbox
+        defaultChecked={checkValue}
+        disabled={checkValue}
+        onChange={onChange}
+      />
+    );
+  }
+}
+
+function handleComments(comments, rowId, mantType, checklist) {
+  console.log("MATENIMIENTO", mantType);
+  // console.log(mantType === "mant-end");
+  // console.log("no comments");
+  if (mantType === "mant-end") {
+    return;
+  } else {
+    return (
+      <Input
+        defaultValue={comments}
+        disabled={checklist}
+        onChange={(event) => handleCommentsChange(event, rowId)}
+      />
+    );
+  }
 }
 
 const alertTypes = [
   "Batería baja",
   "Mantenimiento - Inicio",
   "Mantenimiento - Fin",
-  "Mantenimiento preventivo 250",
-  "Mantenimiento preventivo 500",
-  "Mantenimiento preventivo 750",
+  "Mantenimiento preventivo 1",
+  "Mantenimiento preventivo 2",
+  "Mantenimiento preventivo 3",
 ];
+
+function handleMaintenanceTypeChange(value, id) {
+  const newMaintenanceType = value;
+  // console.log(newMaintenanceType, id);
+
+  // Call your server function to update the database
+  updateDatabase(id, { maintenanceType: newMaintenanceType });
+}
+
+function handleChecklistChange(event, id) {
+  const newCheckValue = event.target.checked;
+  console.log(newCheckValue, id);
+
+  // Call your server function to update the database
+  updateDatabase(id, { checklist: newCheckValue });
+
+  if (newCheckValue) {
+    disableAlertWarning();
+  }
+}
+
+function handleCommentsChange(event, id) {
+  const newComments = event.target.value;
+  // console.log(newComments, id);
+
+  // Call your server function to update the database
+  updateDatabase(id, { comments: newComments });
+}
+
+function updateDatabase(id, updatedValues) {
+  fetch(`/api/alerts/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedValues),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Success:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+function disableAlertWarning() {
+  fetch(`/api/alerts/statusoff`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Success:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}

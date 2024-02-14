@@ -90,7 +90,12 @@ ChartsRouter.post("/heat1", (req, res) => {
       const lat = jsonData.latitude;
       const lng = jsonData.longitude;
       const carga = jsonData.carga;
-      const state = jsonData.state;
+      var state = jsonData.state;
+
+      // Agregamos el filtro para el state de efectivo
+      if (carga >= 2 && state >= 3) {
+        state = 6;
+      }
 
       const weightCheck =
         !req.body.filters.weightRange ||
@@ -164,7 +169,12 @@ ChartsRouter.post("/heat11", (req, res) => {
       const lat = jsonData.latitude;
       const lng = jsonData.longitude;
       const carga = jsonData.carga;
-      const state = jsonData.state;
+      var state = jsonData.state;
+
+      // Agregamos el filtro para el state de efectivo
+      if (carga >= 2 && state >= 3) {
+        state = 6;
+      }
 
       const weightCheck =
         !req.body.filters.weightRange ||
@@ -398,7 +408,11 @@ ChartsRouter.post("/histogram", (req, res) => {
     var array_out = [];
 
     for (var i = 0; i < array_in.length; i++) {
-      array_out[i] = array_in[i];
+      // Solo agregar a array_out si es que arra_in[i].carga es mayor a 0.2
+      if (array_in[i].carga > 0.2) {
+        array_out.push(array_in[i]);
+      }
+      // array_out[i] = array_in[i];
     }
 
     // Get mean of array_out

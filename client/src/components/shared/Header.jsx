@@ -1,33 +1,45 @@
 import React from "react";
-import {
-  HiOutlineChatAlt,
-  HiOutlineSearch,
-  HiOutlineBell,
-} from "react-icons/hi";
-import { Popover, Menu } from "@headlessui/react";
+
 import { Fragment } from "react";
-import { Transition } from "@headlessui/react";
-import classNames from "classnames";
-import { useNavigate } from "react-router-dom";
+
 import Clock from "../utils/Clock";
-import { BiSolidUser } from "react-icons/bi";
 import { GoAlert } from "react-icons/go";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Header() {
-  const navigate = useNavigate();
-  const [weekdays, setWeekdays] = useState([1, 1, 1, 1, 1, 1, 1]);
-  const [initHour, setInitHour] = useState(6);
-  const [endHour, setEndHour] = useState(18);
+  const [showAlert, setShowAlert] = useState(false);
+  // const { showAlert } = useAlertContext();
+
+  function fetchAlert() {
+    fetch(`api/alerts/status`)
+      .then((res) => res.json())
+      .then((data) => {
+        // console.log(data.payload === "1");
+        if (data.payload === "1") {
+          setShowAlert(true);
+        } else {
+          setShowAlert(false);
+        }
+
+        // setPosts(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  }
+
+  // make the fetch every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchAlert();
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="bg-komatsu-gray h-16 px-4 flex justify-between items-center border-b border-gray-200">
       <div>
-        <CurrentSchedule
-          weekdays={weekdays}
-          initHour={initHour}
-          endHour={endHour}
-        />
+        <DeviceSchedule />
       </div>
 
       <div>
@@ -35,166 +47,92 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-2 mr-2">
-        {/* <Popover className="relative">
-          {({ open }) => (
-            <>
-              <Popover.Button
-                className={classNames(
-                  open && "bg-gray-100",
-                  "p-1.5 rounded-sm inline-flex item-center text-gray-700 hover:text-opacity-100 focus:outline-none active:bg-gray-100"
-                )}
-              >
-                <HiOutlineChatAlt fontSize={24} />
-              </Popover.Button>
-
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-200"
-                enterFrom="opacity-0 translate-y-1"
-                enterTo="opacity-100 translate-y-0"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 translate-y-0"
-                leaveTo="opacity-0 translate-y-1"
-              >
-                <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
-                  <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
-                    <strong className="text-gray700 font-medium">
-                      Messages
-                    </strong>
-                    <div className="mt-2 py-1 text-sm">
-                      This is messages panel
-                    </div>
-                  </div>
-                </Popover.Panel>
-              </Transition>
-            </>
-          )}
-        </Popover>
-
-        <Popover className="relative">
-          {({ open }) => (
-            <>
-              <Popover.Button
-                className={classNames(
-                  open && "bg-gray-100",
-                  "p-1.5 rounded-sm inline-flex item-center text-gray-700 hover:text-opacity-100 focus:outline-none active:bg-gray-100"
-                )}
-              >
-                <HiOutlineBell fontSize={24} />
-              </Popover.Button>
-
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-200"
-                enterFrom="opacity-0 translate-y-1"
-                enterTo="opacity-100 translate-y-0"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 translate-y-0"
-                leaveTo="opacity-0 translate-y-1"
-              >
-                <Popover.Panel className="absolute right-0 z-10 mt-2.5 transform w-80">
-                  <div className="bg-white rounded-sm shadow-md ring-1 ring-black ring-opacity-5 px-2 py-2.5">
-                    <strong className="text-gray700 font-medium">
-                      Notifications
-                    </strong>
-                    <div className="mt-2 py-1 text-sm">
-                      This is Notifications panel
-                    </div>
-                  </div>
-                </Popover.Panel>
-              </Transition>
-            </>
-          )}
-        </Popover> */}
-
-        {/* <div className="flex items-center gap-2 mr-10 myBlink">
-          <GoAlert fontSize={50} className="text-red-600" />
-          <span className="text-red-600">Mantenimiento</span>
-        </div> */}
-
-        {/* <Menu as="div" className="relative">
-          <div>
-            <Menu.Button className="ml-2 inline-flex rounded-full focus:outline-none focus:ring-2 focus:ring-neutral-400">
-              <span className="sr-only">Open user menu</span>
-              <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center">
-                <BiSolidUser fontSize={30} />
-                <span className="sr-only"> User </span>
-              </div>
-            </Menu.Button>
+        {showAlert && (
+          <div className="flex items-center gap-2 mr-10 myBlink">
+            <GoAlert fontSize={50} className="text-red-600" />
+            <span className="text-red-600">Mantenimiento</span>
           </div>
-
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-          >
-            <Menu.Items className="ring-black ring-opacity-5 origin-top-right z-10 absolute right-0 mt-2 w-48 rounded-sm shadow-md p-1 bg-white ring-1 ring-opacity-5 focus:outline-none">
-              <div className="px-1 py-1 ">
-                <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(
-                        active && "bg-gray-100",
-                        "cursor-pointer text-gray-700 focus:bg-gray-200 rounded-sm px-4 py-2"
-                      )}
-                      onClick={() => navigate("/profile")}
-                    >
-                      Your profile
-                    </div>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(
-                        active && "bg-gray-100",
-                        "cursor-pointer text-gray-700 focus:bg-gray-200 rounded-sm px-4 py-2"
-                      )}
-                      onClick={() => navigate("/settings")}
-                    >
-                      Settings
-                    </div>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <div
-                      className={classNames(
-                        active && "bg-gray-100",
-                        "cursor-pointer text-gray-700 focus:bg-gray-200 rounded-sm px-4 py-2"
-                      )}
-                      onClick={() => navigate("/logout")}
-                    >
-                      Logout
-                    </div>
-                  )}
-                </Menu.Item>
-              </div>
-            </Menu.Items>
-          </Transition>
-        </Menu> */}
+        )}
       </div>
     </div>
   );
 }
 
-function CurrentSchedule({ weekdays, initHour, endHour }) {
-  const days = ["D", "L", "M", "M", "J", "V", "S"];
+export function DeviceSchedule({
+  dataPath = "schedule",
+  chartName,
+  serverType = "settings",
+}) {
+  const [edit, setEdit] = useState(false);
+  const [weekdays, setWeekdays] = useState([0, 1, 1, 1, 1, 1, 0]);
+  const [initHour, setInitHour] = useState(8);
+  const [endHour, setEndHour] = useState(18);
+  const [isFetching, setIsFetching] = useState(false);
+
+  const fetchData = () => {
+    if (!isFetching) {
+      setIsFetching(true);
+      fetch(`api/${serverType}/${dataPath}`)
+        .then((res) => res.json())
+        .then((data) => {
+          // console.log(data);
+          setWeekdays(data.weekdays);
+          setInitHour(data.initHour);
+          setEndHour(data.endHour);
+          setIsFetching(false);
+
+          // setPosts(data);
+        })
+        .catch((err) => {
+          console.log(err.message);
+          setIsFetching(false);
+        });
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onEdit = () => {
+    setEdit(true);
+  };
 
   return (
     <Fragment>
-      <div className="pb-1 flex">
-        <div className="flex justify-center gap-4">
+      <strong className="text-gray-700 font-medium">{chartName}</strong>
+      <div className="overflow:hidden w-full h-full p-4">
+        <CurrentSchedule
+          onEdit={onEdit}
+          weekdays={weekdays}
+          initHour={initHour}
+          endHour={endHour}
+        />
+      </div>
+    </Fragment>
+  );
+}
+
+export function CurrentSchedule({ onEdit, weekdays, initHour, endHour }) {
+  const days = ["D", "L", "M", "M", "J", "V", "S"];
+
+  const endHour_hour = Math.floor(endHour);
+  const endHour_minutes = Math.round((endHour - endHour_hour) * 60);
+  const initHour_hour = Math.floor(initHour);
+  const initHour_minutes = Math.round((initHour - initHour_hour) * 60);
+
+  // Format hours and minutes
+
+  return (
+    <Fragment>
+      <div className="pb-4 flex flex-row">
+        <div className="flex justify-center gap-4 mt-4">
           <ul className="flex flex-row justify-center gap-4 list-none flex-wrap">
             {days.map((day, index) => (
               <li
                 key={index}
                 className={`w-9 h-9 flex items-center justify-center rounded-full select-none ${
-                  weekdays[index] ? "bg-komatsu-blue text-white" : "bg-white"
+                  weekdays[index] ? "bg-komatsu-blue text-white" : "bg-gray-50"
                 }`}
               >
                 {day}
@@ -203,8 +141,11 @@ function CurrentSchedule({ weekdays, initHour, endHour }) {
           </ul>
         </div>
 
-        <div className="flex justify-center pt-7 pl-5">
-          Horario: {initHour}:00 - {endHour}:30
+        <div className="justify-center align-middle mt-10 ml-6">
+          Horario: {initHour_hour < 10 ? "0" + initHour_hour : initHour_hour}:
+          {initHour_minutes < 10 ? "0" + initHour_minutes : initHour_minutes} -{" "}
+          {endHour_hour < 10 ? "0" + endHour_hour : endHour_hour}:
+          {endHour_minutes < 10 ? "0" + endHour_minutes : endHour_minutes}
         </div>
       </div>
     </Fragment>

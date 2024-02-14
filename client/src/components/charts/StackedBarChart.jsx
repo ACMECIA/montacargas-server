@@ -142,7 +142,7 @@ export default function StackedBarChart({
     tooltip: {
       headerFormat: "<b>{point.x}</b><br/>",
       pointFormat:
-        "{series.name}: {point.y:.2f}<br/>Total: {point.stackTotal:.2f}",
+        "{series.name}: {point.percentage:.2f} %<br/>Horas: {point.y:.2f}",
     },
     plotOptions: {
       column: {
@@ -154,24 +154,15 @@ export default function StackedBarChart({
     },
     series: [
       {
-        name: "Apagado",
-        data: data1,
-        color: "rgb(40,40,40)",
-      },
-      {
-        name: "Inoperativo",
-        data: data2,
-        color: "rgb(120,120,120)",
-      },
-      {
-        name: "Espera sin carga",
-        data: data3,
-        color: "rgb(170,170,170)",
-      },
-      {
         name: "Espera con carga",
         data: data4,
         color: "rgb(142,202,230)",
+      },
+
+      {
+        name: "Traslado con carga",
+        data: data6,
+        color: "rgb(14,18,113)",
       },
       {
         name: "Traslado sin carga",
@@ -179,9 +170,19 @@ export default function StackedBarChart({
         color: "rgb(0,148,206)",
       },
       {
-        name: "Efectivo",
-        data: data6,
-        color: "rgb(14,18,113)",
+        name: "Espera sin carga",
+        data: data3,
+        color: "rgb(170,170,170)",
+      },
+      {
+        name: "Inoperativo",
+        data: data2,
+        color: "rgb(120,120,120)",
+      },
+      {
+        name: "Proceso Administrativo (Equipo Apagado)",
+        data: data1,
+        color: "rgb(40,40,40)",
       },
     ],
   };

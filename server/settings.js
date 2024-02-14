@@ -1,12 +1,12 @@
 import { Router } from "express";
 import keys from "./keys.js";
-import bodyParser from "body-parser";
 
 import mysql from "mysql";
+import multer from "multer";
 
 const SettingsRouter = Router();
 
-SettingsRouter.use(bodyParser.json());
+// SettingsRouter.use(bodyParser.json());
 
 export default SettingsRouter;
 
@@ -110,3 +110,25 @@ SettingsRouter.post("/schedule/edit", (req, res) => {
     // res.send(result);
   });
 });
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/data/uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, "layout.png");
+  },
+});
+
+const upload = multer({ storage: storage });
+// const upload = multer({ dest: "./public/data/uploads/" });
+SettingsRouter.post(
+  "/upload",
+  upload.single("uploaded_file"),
+  function (req, res) {
+    // req.file is the name of your file in the form above, here 'uploaded_file'
+    // req.body will hold the text fields, if there were any
+    console.log(req.file, req.body);
+    res.status(200).send("File uploaded");
+  }
+);

@@ -40,23 +40,30 @@ UtilsRouter.post("/download", (req, res) => {
     var array_in = data.map((row) => JSON.parse(row.data));
     var array_out = [];
 
-    for (var i = 0; i < array_in.length; i++) {
-      array_out[i] = array_in[i];
-      array_out[i].timestamp = unixTimestampToHumanReadable(
-        array_out[i].timestamp
-      );
+    if (array_in.length === 0) {
+      return res.json({
+        Status: "Success",
+        payload: { data: "No data", filename: "no_data" },
+      });
+    } else {
+      for (var i = 0; i < array_in.length; i++) {
+        array_out[i] = array_in[i];
+        array_out[i].timestamp = unixTimestampToHumanReadable(
+          array_out[i].timestamp
+        );
+      }
+
+      var filename = `${array_out[0].timestamp.split(" ")[0]} hasta ${
+        array_out[array_out.length - 1].timestamp.split(" ")[0]
+      }`;
+
+      var csvString = arrayToCSV(array_out);
+
+      return res.json({
+        Status: "Success",
+        payload: { data: csvString, filename: filename },
+      });
     }
-
-    var filename = `${array_out[0].timestamp.split(" ")[0]} hasta ${
-      array_out[array_out.length - 1].timestamp.split(" ")[0]
-    }`;
-
-    var csvString = arrayToCSV(array_out);
-
-    return res.json({
-      Status: "Success",
-      payload: { data: csvString, filename: filename },
-    });
   });
 });
 

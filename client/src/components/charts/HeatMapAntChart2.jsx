@@ -21,6 +21,7 @@ export default function HeatMapAntChart({
   dataPath,
   dataRate = 10000,
   serverType = "charts",
+  heatColors = "#F51D27-#FA541C-#FF8C12-#FFC838-#FAFFA8-#80FF73-#12CCCC-#1890FF-#6E32C2",
   statusFilter = [
     { value: "positivo", label: "Uso Efectivo" },
     { value: "negativo", label: "Uso Complementario" },
@@ -68,6 +69,7 @@ export default function HeatMapAntChart({
     const config = {
       data,
       height: 700,
+
       //   label: {
       //     fill: 'black',
       //   },
@@ -86,6 +88,7 @@ export default function HeatMapAntChart({
       //         }
       //     },
       // },
+
       xAxis: {
         min: 0,
         max: 100,
@@ -96,13 +99,20 @@ export default function HeatMapAntChart({
       },
 
       type: "density",
+      // padding: 4,
       xField: "g",
       yField: "l",
       colorField: "tmp",
       // color:
       //   "#F51D27-#FA541C-#FF8C12-#FFC838-#FAFFA8-#80FF73-#12CCCC-#1890FF-#6E32C2",
-      color:
-        "#6E32C2-#1890FF-#12CCCC-#80FF73  -#FAFFA8-#FFC838-#FF8C12-#FA541C-#F51D27",
+      // Para repeticiones
+      color: heatColors,
+      // "#F51D27-#FA541C-#FF8C12-#FFC838-#FAFFA8-#80FF73-#12CCCC-#1890FF"
+
+      // Para pesos invertir
+      // color: "#12CCCC-#80FF73  -#FAFFA8-#FFC838-#FF8C12-#FA541C-#F51D27",
+      // invert the colors above
+      // color: "#F51D27-#FA541C-#FF8C12-#FFC838-#FAFFA8-#80FF73-#12CCCC",
       legend: {
         // label: {
         //     style : {
@@ -120,7 +130,8 @@ export default function HeatMapAntChart({
           type: "image",
           start: ["min", "max"],
           end: ["max", "min"],
-          src: layoutImage,
+          // src: layoutImage,
+          src: "/data/uploads/layout.png",
         },
       ],
     };

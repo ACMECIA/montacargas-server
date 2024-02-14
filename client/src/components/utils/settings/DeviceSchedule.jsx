@@ -125,9 +125,12 @@ export default function DeviceSchedule({ dataPath, chartName, serverType }) {
         weekdays[index] = 1;
       });
       console.log(hours);
-      // Get the hours as numbers
-      var initHour = parseInt(hours[0].hour());
-      var endHour = parseInt(hours[1].hour());
+      // Get the hours and minutes as numbers
+
+      var initHour =
+        parseInt(hours[0].hour()) + parseInt(hours[0].minute()) / 60;
+      var endHour =
+        parseInt(hours[1].hour()) + parseInt(hours[1].minute()) / 60;
 
       fetchEdit({ weekdays, initHour, endHour });
 
@@ -175,6 +178,13 @@ function CurrentSchedule({ onEdit, weekdays, initHour, endHour }) {
   const sumDays = weekdays.reduce((a, b) => a + b, 0);
   const totalHours = 4 * sumDays * (endHour - initHour);
 
+  const endHour_hour = Math.floor(endHour);
+  const endHour_minutes = Math.round((endHour - endHour_hour) * 60);
+  const initHour_hour = Math.floor(initHour);
+  const initHour_minutes = Math.round((initHour - initHour_hour) * 60);
+
+  // Format hours and minutes
+
   return (
     <Fragment>
       <div className="pb-4">
@@ -196,7 +206,10 @@ function CurrentSchedule({ onEdit, weekdays, initHour, endHour }) {
         </div>
 
         <div className="flex justify-center py-2">
-          Horario: {initHour}:00 - {endHour}:00
+          Horario: {initHour_hour < 10 ? "0" + initHour_hour : initHour_hour}:
+          {initHour_minutes < 10 ? "0" + initHour_minutes : initHour_minutes} -{" "}
+          {endHour_hour < 10 ? "0" + endHour_hour : endHour_hour}:
+          {endHour_minutes < 10 ? "0" + endHour_minutes : endHour_minutes}
         </div>
         <div className="flex justify-center py-2">
           Total de horas mensuales: {totalHours} h
@@ -220,7 +233,7 @@ function EditSchedule({ onSubmit, onCancel }) {
   };
 
   const onChangeHours = (value) => {
-    // console.log(value);
+    console.log(value);
     setHours(value);
   };
 
@@ -230,7 +243,7 @@ function EditSchedule({ onSubmit, onCancel }) {
       <WeekDaysDropdown onChange={onChangeDropdown} />
       <TimePicker.RangePicker
         use12Hours
-        format="h:00 a"
+        format="hh:mm a"
         onChange={onChangeHours}
       />
 

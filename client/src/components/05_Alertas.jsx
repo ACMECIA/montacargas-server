@@ -39,7 +39,7 @@ export default function Alertas() {
 
       <div className="flex flex-row gap-4 w-full">
         <Box>
-          <AlertsReport></AlertsReport>
+          <AlertsReport dataPath={"download"} serverType={"alerts"} />
         </Box>
       </div>
     </div>

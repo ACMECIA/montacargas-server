@@ -12,7 +12,7 @@ export default function EstatusMensual() {
         <Box>
           <FrenquencyChart
             dataPath={"frequency"}
-            chartName={"Frecuencia de uso mensual"}
+            chartName={"Condición de equipo"}
             serverType={"charts"}
           />
         </Box>

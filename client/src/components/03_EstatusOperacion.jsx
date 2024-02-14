@@ -55,7 +55,7 @@ export default function EstatusOperacion() {
             dataPath={"histogram"}
             serverType={"charts"}
             chartName={"Histograma de cargas"}
-            binWidth={0.1}
+            binWidth={0.5}
           ></HistogramChart>
         </Box>
       </div>

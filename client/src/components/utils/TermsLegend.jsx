@@ -7,8 +7,8 @@ export default function TermsLegend({ chartName }) {
 
       <div className="mt-5 mx-2 items-justify flex flex-col text-sm">
         <p className="mb-1 text-xs">
-          <strong>Apagado:</strong> Se considera cuando el montacarga esta
-          apagado (Señal de encendido apagada).
+          <strong>Proceso Administrativo (Equipo Apagado):</strong> Se considera
+          cuando el montacarga esta apagado (Señal de encendido apagada).
         </p>
         <p className="mb-0.5 text-xs">
           <strong>Inoperativo:</strong> Se considera cuando el equipo activo el
@@ -27,8 +27,8 @@ export default function TermsLegend({ chartName }) {
           movimiento y sin carga.
         </p>
         <p className="mb-0.5 text-xs">
-          <strong>Efectivo:</strong> Se considera efectivo cuando el montacarga
-          se encuentra en movimiento y con carga.
+          <strong>Traslado con carga:</strong> Se considera efectivo cuando el
+          montacarga se encuentra en movimiento y con carga.
         </p>
 
         <p className="mb-0.5 text-xs">
@@ -42,6 +42,10 @@ export default function TermsLegend({ chartName }) {
         <p className="mb-0.5 text-xs">
           <strong>Frecuencia de uso</strong> = Tiempo de Uso / Tiempo total *
           100
+        </p>
+        <p className="mb-0.5 text-xs">
+          <strong>Efectivo:</strong> = Se considera cuando está en uso con carga
+          mayor igual a 2 Tn.
         </p>
         <p className="mb-0.5 text-xs">
           <strong>Frecuencia efectiva de uso</strong> = Tiempo efectivo / Tiempo
