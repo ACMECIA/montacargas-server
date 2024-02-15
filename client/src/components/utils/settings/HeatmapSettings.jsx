@@ -28,7 +28,8 @@ export default function HeatmapConfig({
         console.log(err.message);
       });
   };
-  const [imageSrc, setImageSrc] = useState("/data/uploads/layout.png");
+
+  const [imageSrc, setImageSrc] = useState("/files/uploads/layout.png");
 
   const props = {
     beforeUpload: (file) => {
@@ -41,7 +42,7 @@ export default function HeatmapConfig({
     onChange: (info) => {
       // console.log(info.fileList);
       if (info.fileList[0].status === "done") {
-        setImageSrc(`/data/uploads/layout.png?t=${Date.now()}`);
+        setImageSrc(`/files/uploads/layout.png?t=${Date.now()}`);
         console.log(`Uploaded successfully`);
       }
     },
@@ -127,11 +128,8 @@ export function FormFilter({ width = "60%", formName, fetchData }) {
     console.log(fieldsValue);
     const values = {
       ...fieldsValue,
-      dateRange: fieldsValue["range-time-picker"].map((item) =>
-        Math.round(item.valueOf() / 1000)
-      ),
-      weightRange: fieldsValue["weight-filter"],
-      stateFilter: fieldsValue["state-filter"],
+      latitudeRange: fieldsValue["latitude-range"],
+      longitudeRange: fieldsValue["longitude-range"],
     };
 
     fetchData({ filters: values });
@@ -149,11 +147,7 @@ export function FormFilter({ width = "60%", formName, fetchData }) {
       onFinishFailed={onFinishFailed}
       style={{ width: "100%" }}
     >
-      <Form.Item
-        name="latitude"
-        label="Latitud (x)"
-        // {...rangeConfig}
-      >
+      <Form.Item name="latitude-range" label="Latitud (x)" {...rangeConfig}>
         <NumberRange
           label1={"latitud mínima"}
           label2={"latitud máxima"}
@@ -162,11 +156,7 @@ export function FormFilter({ width = "60%", formName, fetchData }) {
         />
       </Form.Item>
 
-      <Form.Item
-        name="longitude"
-        label="Longitud (y)"
-        // {...rangeConfig}
-      >
+      <Form.Item name="longitude-range" label="Longitud (y)" {...rangeConfig}>
         <NumberRange
           label1={"longitud mínima"}
           label2={"longitud máxima"}

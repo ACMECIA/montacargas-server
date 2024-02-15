@@ -131,7 +131,7 @@ export default function HeatMapAntChart({
           start: ["min", "max"],
           end: ["max", "min"],
           // src: layoutImage,
-          src: "/data/uploads/layout.png",
+          src: "/files/uploads/layout.png",
         },
       ],
     };

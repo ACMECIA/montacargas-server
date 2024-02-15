@@ -67,6 +67,23 @@ ChartsRouter.post("/heat1", (req, res) => {
   var query = `SELECT * FROM local_data WHERE 
     date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
 
+  var limitsQuery = `SELECT json FROM persistent_data WHERE tag = 'coordinates'`;
+
+  var minLat = -12.0487;
+  var maxLat = -12.0468;
+  var minLng = -77.1017;
+  var maxLng = -77.1001;
+
+  db.query(limitsQuery, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+    var limits = JSON.parse(data[0].json);
+
+    minLat = limits.minLat;
+    maxLat = limits.maxLat;
+    minLng = limits.minLon;
+    maxLng = limits.maxLon;
+  });
+
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
@@ -75,10 +92,10 @@ ChartsRouter.post("/heat1", (req, res) => {
       Array.from({ length: gridSize }, () => ({ count: 0 }))
     );
     // Establecer límites de latitud y longitud (ejemplo)
-    const minLat = -12.0487;
-    const maxLat = -12.0468;
-    const minLng = -77.1017;
-    const maxLng = -77.1001;
+    // const minLat = -12.0487;
+    // const maxLat = -12.0468;
+    // const minLng = -77.1017;
+    // const maxLng = -77.1001;
 
     const latStep = (maxLat - minLat) / gridSize;
     const lngStep = (maxLng - minLng) / gridSize;
@@ -145,6 +162,22 @@ ChartsRouter.post("/heat11", (req, res) => {
   var query = `SELECT * FROM local_data WHERE 
     date >= FROM_UNIXTIME(${dates[0]}) AND date <= FROM_UNIXTIME(${dates[1]});`;
 
+  var limitsQuery = `SELECT json FROM persistent_data WHERE tag = 'coordinates'`;
+
+  var minLat = -12.0487;
+  var maxLat = -12.0468;
+  var minLng = -77.1017;
+  var maxLng = -77.1001;
+
+  db.query(limitsQuery, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+    var limits = JSON.parse(data[0].json);
+
+    minLat = limits.minLat;
+    maxLat = limits.maxLat;
+    minLng = limits.minLon;
+    maxLng = limits.maxLon;
+  });
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
@@ -154,10 +187,10 @@ ChartsRouter.post("/heat11", (req, res) => {
     );
 
     // Establecer límites de latitud y longitud (ejemplo)
-    const minLat = -12.0487;
-    const maxLat = -12.0468;
-    const minLng = -77.1017;
-    const maxLng = -77.1001;
+    // const minLat = -12.0487;
+    // const maxLat = -12.0468;
+    // const minLng = -77.1017;
+    // const maxLng = -77.1001;
 
     const latStep = (maxLat - minLat) / gridSize;
     const lngStep = (maxLng - minLng) / gridSize;

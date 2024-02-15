@@ -120,7 +120,10 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5242880 /* 5 MB in bytes */ },
+});
 // const upload = multer({ dest: "./public/data/uploads/" });
 SettingsRouter.post(
   "/upload",
@@ -132,3 +135,20 @@ SettingsRouter.post(
     res.status(200).send("File uploaded");
   }
 );
+
+SettingsRouter.post("/heatmap", (req, res) => {
+  console.log(req.body.filters);
+  const minLat = req.body.filters.latitudeRange[0];
+  const maxLat = req.body.filters.latitudeRange[1];
+  const minLng = req.body.filters.longitudeRange[0];
+  const maxLng = req.body.filters.longitudeRange[1];
+
+  const sqlQuery = `UPDATE \`persistent_data\` SET \`json\` = '{\"minLat\":${minLat}, \"maxLat\": ${maxLat}, \"minLon\": ${minLng}, \"maxLon\":${maxLng}}' WHERE \`persistent_data\`.\`tag\` = 'coordinates'`;
+
+  db.query(sqlQuery, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    res.status(200).send(result);
+  });
+});
