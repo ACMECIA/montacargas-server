@@ -4,12 +4,36 @@ import { UploadOutlined } from "@ant-design/icons";
 import { Button, message, Upload, Image, InputNumber } from "antd";
 import { Form, Space } from "antd";
 import SubmitButton from "../../charts/components/SubmitButton";
+import GeneralButton from "../GeneralButton";
 
 export default function HeatmapConfig({
   chartName = "Heatmap config",
   serverType,
   dataPath,
 }) {
+  const [limits, setLimits] = useState({});
+  const [edit, setEdit] = useState(false);
+  const fetchGetLimits = () => {
+    fetch(`api/settings/heatlimits`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Limits", data);
+        setLimits(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  useEffect(() => {
+    fetchGetLimits();
+  }, []);
+
   const fetchEdit = ({ filters }) => {
     fetch(`api/settings/heatmap`, {
       method: "POST",
@@ -52,6 +76,19 @@ export default function HeatmapConfig({
     maxCount: 1,
   };
 
+  const onEdit = () => {
+    setEdit(true);
+  };
+
+  const onCancel = () => {
+    setEdit(false);
+  };
+
+  const onSubmit = (values) => {
+    fetchEdit(values);
+    setEdit(false);
+  };
+
   return (
     <Fragment>
       <strong className="text-gray-700 font-medium">{chartName}</strong>
@@ -64,19 +101,64 @@ export default function HeatmapConfig({
           </Button>
         </Upload>
       </div>
-      <CoordinatesLimits fetchEdit={fetchEdit} />
+      {/* <CoordinatesLimitsEdit defaultLimits={limits} /> */}
+      {/* {edit ? (
+        <CoordinatesLimitsEdit
+          fetchEdit={fetchEdit}
+          defaultLimits={limits}
+          onCancel={onCancel}
+          onSubmit={onSubmit}
+        />
+      ) : (
+        <CoordinatesLimitsShow defaultLimits={limits} onEdit={onEdit} />
+      )} */}
+      <CoordinatesLimitsShow defaultLimits={limits} onEdit={onEdit} />
+      <CoordinatesLimitsEdit
+        fetchEdit={fetchEdit}
+        defaultLimits={limits}
+        onCancel={onCancel}
+        onSubmit={onSubmit}
+      />
     </Fragment>
   );
 }
-
-export function CoordinatesLimits({ fetchEdit }) {
+export function CoordinatesLimitsShow({ defaultLimits, onEdit }) {
+  // write simple code to show 4 values that are in the defaultLimits json, and has
+  // minLat, maxLat, minLong, maxLong
   return (
     <Fragment>
       <div className="overflow:hidden w-full h-full p-4">
         <div className="flex flex-col gap-4">
           <div>
             <div className="flex flex-row gap-4">
-              <FormFilter formName="LatLongFilter" fetchData={fetchEdit} />
+              <div>
+                <strong className="text-gray-700 font-medium">
+                  Coordenadas
+                </strong>
+                <div className="flex flex-row gap-4 mt-4 justify-center items-center">
+                  <div className="flex flex-col justify-center items-center">
+                    <strong className="text-black-700 font-medium">
+                      Latitud
+                    </strong>
+                    <p className="text-black-700 font-medium text-justify">
+                      Mínima: {defaultLimits.minLat} <br />
+                      Máxima: {defaultLimits.maxLat}
+                    </p>
+                  </div>
+                  <div className="flex flex-col justify-center items-center">
+                    <strong className="text-black-700 font-medium">
+                      Longitud
+                    </strong>
+                    <p className="text-black-700 font-medium text-justify">
+                      Mínima: {defaultLimits.minLon} <br />
+                      Máxima: {defaultLimits.maxLon}
+                    </p>
+                  </div>
+                </div>
+                {/* <div className="flex flex-row justify-center py-2">
+                  <GeneralButton onClickFunction={onEdit}>Editar</GeneralButton>
+                </div> */}
+              </div>
             </div>
           </div>
         </div>
@@ -85,7 +167,41 @@ export function CoordinatesLimits({ fetchEdit }) {
   );
 }
 
-export function FormFilter({ width = "60%", formName, fetchData }) {
+export function CoordinatesLimitsEdit({ fetchEdit, defaultLimits, onCancel }) {
+  return (
+    <Fragment>
+      <div className="overflow:hidden w-full h-full p-4">
+        <div className="flex flex-col gap-4">
+          <div>
+            <div className="flex flex-col gap-4">
+              <FormFilter
+                formName="LatLongFilter"
+                fetchData={fetchEdit}
+                defaultLimits={defaultLimits}
+              />
+              <div className="flex justify-center items-center">
+                {/* <GeneralButton
+                  color="komatsu-blue-light"
+                  width={"50%"}
+                  onClickFunction={onCancel}
+                >
+                  Cancelar
+                </GeneralButton> */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Fragment>
+  );
+}
+
+export function FormFilter({
+  width = "70%",
+  formName,
+  fetchData,
+  defaultLimits,
+}) {
   const formItemLayout = {
     labelCol: {
       xs: {
@@ -177,7 +293,16 @@ export function FormFilter({ width = "60%", formName, fetchData }) {
   );
 }
 
-export function NumberRange({ label1, label2, units, width, value, onChange }) {
+export function NumberRange({
+  label1,
+  label2,
+  units,
+  width,
+  value,
+  onChange,
+  default1,
+  default2,
+}) {
   const on1Change = (val) => {
     const current = value ? [...value] : [];
     current[0] = val === null ? 0 : val;
@@ -197,13 +322,17 @@ export function NumberRange({ label1, label2, units, width, value, onChange }) {
   //   }
 
   // };
+  console.log("defaultvalue", default1);
 
   return (
     <Space.Compact block style={{ width: width }}>
       <InputNumber
         placeholder={label1}
         style={{ width: "100%" }}
-        // defaultValue={1000}
+        defaultValue={default1}
+        min="-180"
+        max="180"
+        step="0.00001"
         // formatter={(value) =>
         //   `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         // }
@@ -215,7 +344,10 @@ export function NumberRange({ label1, label2, units, width, value, onChange }) {
         // addonAfter={units}
         placeholder={label2}
         style={{ width: "100%" }}
-        // defaultValue={100}
+        defaultValue={default2}
+        min="-180"
+        max="180"
+        step="0.00001"
         // min={0}
         // max={100}
         // formatter={(value) => `${value} Ton.`}
