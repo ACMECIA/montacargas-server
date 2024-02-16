@@ -97,7 +97,7 @@ export default function HeatmapConfig({
 
         <Upload {...props}>
           <Button icon={<UploadOutlined />}>
-            Subir imagen en formato .png
+            Subir imagen .png (1 MB máx.)
           </Button>
         </Upload>
       </div>
