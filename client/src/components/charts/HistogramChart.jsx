@@ -91,12 +91,19 @@ export default function HistogramChart({
     tooltip: {
       formatter: (datum) => {
         // Redondear los valores en el tooltip
-        const roundedCount = Math.round(datum.count * 100) / 100;
+        const roundedCount = datum.count;
+        const total = data.length;
+        const percentage = ((roundedCount / total) * 100).toFixed(2);
 
         const roundedRange = datum.range.map(
           (value) => Math.round(value * 100) / 100
         );
-        return { name: "Cuenta", value: roundedCount, title: roundedRange };
+
+        return {
+          name: "Cuenta",
+          value: `${roundedCount} (${percentage}%)`,
+          title: roundedRange,
+        };
       },
     },
   };

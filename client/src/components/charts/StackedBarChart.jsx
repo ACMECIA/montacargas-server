@@ -177,7 +177,7 @@ export default function StackedBarChart({
       {
         name: "Inoperativo",
         data: data2,
-        color: "rgb(120,120,120)",
+        color: "rgb(229,131,0)",
       },
       {
         name: "Proceso Administrativo (Equipo Apagado)",
