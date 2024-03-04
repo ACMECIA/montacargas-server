@@ -442,9 +442,9 @@ ChartsRouter.post("/histogram", (req, res) => {
 
     for (var i = 0; i < array_in.length; i++) {
       // Solo agregar a array_out si es que arra_in[i].carga es mayor a 0.2
-      if (array_in[i].carga > 0.2) {
-        array_out.push(array_in[i]);
-      }
+      // if (array_in[i].carga > 0.2) {
+      array_out.push(array_in[i]);
+      // }
       // array_out[i] = array_in[i];
     }
 
@@ -506,7 +506,7 @@ ChartsRouter.get("/confiabilidad", (req, res) => {
 
     var array_in = data.map((row) => JSON.parse(row.data));
 
-    var arrayCorrective = [5, 6, 7, 8, 4, 3, 6, 2, 4, 5, 0, 1];
+    var arrayCorrective = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     // Obtenemos los tiempos de paradas
     var paradasMensuales = cumulatedStateHours(array_in, 1);
@@ -548,11 +548,15 @@ ChartsRouter.get("/detenciones", (req, res) => {
 
     // Obtenermos el acumulado del estado 1, es decir inoperativo
     var array1 = cumulatedStateHours(array_in, 1);
+    var array2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
     // obtener la disponibilidad restando maxHours - array1 entre maxHours
     // elementwise
     array1 = array1.map((x) => (100 * (maxHours - x)) / maxHours);
 
-    return res.json({ Status: "Success", payload: { array1 } });
+    // Por ahora, porque aun no definimos las horas de cada tipo
+
+    array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    return res.json({ Status: "Success", payload: { array1, array2 } });
   });
 });

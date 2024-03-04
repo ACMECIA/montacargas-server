@@ -54,7 +54,7 @@ export default function EstatusOperacion() {
           <HistogramChart
             dataPath={"histogram"}
             serverType={"charts"}
-            chartName={"Histograma de cargas"}
+            chartName={"Distribución de cargas"}
             binWidth={0.5}
           ></HistogramChart>
         </Box>

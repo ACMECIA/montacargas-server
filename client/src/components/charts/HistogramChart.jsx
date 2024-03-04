@@ -83,6 +83,10 @@ export default function HistogramChart({
         text: "Cargas (Ton.)",
       },
     },
+    yAxis: {
+      // disable yAxis
+      visible: false,
+    },
 
     binField: "carga",
     binWidth: binWidth,
@@ -101,7 +105,8 @@ export default function HistogramChart({
 
         return {
           name: "Cuenta",
-          value: `${roundedCount} (${percentage}%)`,
+          // value: `${roundedCount} (${percentage}%)`,
+          value: `${percentage}%`,
           title: roundedRange,
         };
       },
