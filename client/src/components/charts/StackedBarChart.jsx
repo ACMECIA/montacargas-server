@@ -28,16 +28,19 @@ export default function StackedBarChart({
   dataRate,
   serverType,
 }) {
-  // const [data1, setData1] = useLocalStorage(`${dataPath}`, array1);
-  // const [data2, setData2] = useLocalStorage(`${dataPath}2`, array2);
-  // const [data3, setData3] = useLocalStorage(`${dataPath}3`, array3);
+  const [data1, setData1] = useLocalStorage(`${dataPath}`, array1);
+  const [data2, setData2] = useLocalStorage(`${dataPath}2`, array2);
+  const [data3, setData3] = useLocalStorage(`${dataPath}3`, array3);
+  const [data4, setData4] = useLocalStorage(`${dataPath}4`, array4);
+  const [data5, setData5] = useLocalStorage(`${dataPath}5`, array5);
+  const [data6, setData6] = useLocalStorage(`${dataPath}6`, array6);
 
-  const [data1, setData1] = useState(array1);
-  const [data2, setData2] = useState(array2);
-  const [data3, setData3] = useState(array3);
-  const [data4, setData4] = useState(array4);
-  const [data5, setData5] = useState(array5);
-  const [data6, setData6] = useState(array6);
+  // const [data1, setData1] = useState(array1);
+  // const [data2, setData2] = useState(array2);
+  // const [data3, setData3] = useState(array3);
+  // const [data4, setData4] = useState(array4);
+  // const [data5, setData5] = useState(array5);
+  // const [data6, setData6] = useState(array6);
 
   const [isFetching, setIsFetching] = useState(false);
 

@@ -58,6 +58,7 @@ export default function UserManagement({ chartName, serverType, dataPath }) {
   };
 
   const fetchAdd = async (values) => {
+    console.log(values);
     if (!isFetching) {
       setIsFetching(true);
       const res = await fetch(`api/${serverType}/${dataPath}/add`, {
@@ -148,12 +149,16 @@ function UsersTable({ users, onAdd, onDel }) {
         <thead>
           <tr>
             <td>Emails</td>
+            <td>Reportes</td>
+            <td>Alertas</td>
           </tr>
         </thead>
         <tbody>
           {users.map((row) => (
             <tr key={row.id}>
               <td>{row.email}</td>
+              <td>{row.reports ? "Habilitado" : "No Habilitado"}</td>
+              <td>{row.alerts ? "Habilitado" : "No Habilitado"}</td>
             </tr>
           ))}
         </tbody>
@@ -189,7 +194,8 @@ function AddUser({ onCancel, onSubmit }) {
           maxWidth: 500,
         }}
         initialValues={{
-          remember: true,
+          reports: false,
+          alerts: false,
         }}
         onFinish={onSubmit}
         onFinishFailed={onFinishFailed}
@@ -232,6 +238,26 @@ function AddUser({ onCancel, onSubmit }) {
           ]}
         >
           <Input.Password />
+        </Form.Item>
+
+        <Form.Item label="Reportes" name="reports" valuePropName="checked">
+          <div className="flex flex-row py-2 space-x-2">
+            <Checkbox />
+            <label className="text-gray-500">
+              {" "}
+              (Envio de reportes por correo)
+            </label>
+          </div>
+        </Form.Item>
+
+        <Form.Item label="Alertas" name="alerts" valuePropName="checked">
+          <div className="flex flex-row py-2 space-x-2">
+            <Checkbox />
+            <label className="text-gray-500">
+              {" "}
+              (Envio de alertas por correo)
+            </label>
+          </div>
         </Form.Item>
 
         <Form.Item

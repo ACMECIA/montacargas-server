@@ -165,3 +165,45 @@ SettingsRouter.get("/heatlimits", (req, res) => {
     res.status(200).send(data);
   });
 });
+
+SettingsRouter.get("/heatlimits", (req, res) => {
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'coordinates'";
+
+  db.query(sqlSelect, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    let data = JSON.parse(result[0].json);
+    console.log(data);
+    res.status(200).send(data);
+  });
+});
+
+SettingsRouter.get("/mant-prevs", (req, res) => {
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'mant_prevs'";
+
+  db.query(sqlSelect, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    let data = JSON.parse(result[0].json);
+    console.log("RETRIVED DATA", data);
+    res.status(200).send(data);
+  });
+});
+
+SettingsRouter.post("/alerts", (req, res) => {
+  console.log("Before updating", JSON.stringify(req.body.values));
+  // req.body.values to string
+
+  const sqlSelect = `UPDATE persistent_data SET json = '${JSON.stringify(
+    req.body.values
+  )}' WHERE persistent_data.tag = 'mant_prevs'`;
+
+  db.query(sqlSelect, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    res.status(200).send();
+  });
+});

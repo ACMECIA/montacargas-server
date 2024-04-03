@@ -273,7 +273,7 @@ export function cumulatedMonthly(arr, maxHours = 220) {
   if (arr[0].carga >= 2 && arr[0].state >= 3) {
     arr[0]["efecstate"] = 6;
   } else {
-    arr[0]["efecstate"] = 0;
+    arr[0]["efecstate"] = -1;
   }
   // Declaramos el primer valor de resultado
   resultado[rindex] = {
@@ -390,6 +390,7 @@ export function cumulatedMonthly(arr, maxHours = 220) {
     );
   });
   // console.log(sumArray);
+  console.log("horas por messs", horasPorMes);
 
   // Sum the three use state arrays and get the percent with respect to the sumArray elementwise
   array1 = horasPorMes[3].map((x, i) => {
@@ -463,6 +464,131 @@ export function cumulatedStateHours(arr, state) {
   return array1;
 }
 
-export function countCorrectiveMaintenance(arr) {
-  return arr;
+function cumulatedStates(arr) {
+  // declara un array con 6 arrays dentro, uno para cada estado, con valores iniciales de 0
+  let horasPorEstado = new Array(6).fill(0);
+  // let horasEfectivas = new Array(12).fill(0);
+  let resultado = [];
+  let rindex = 0;
+
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    state: arr[0].state,
+    hours: 0,
+    month: new Date(arr[0].timestamp).getMonth(),
+  };
+  rindex++;
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i].state !== arr[i - 1].state) {
+      // Cada que hay un cambio declaramos el nuevo item
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        state: arr[i].state,
+        hours: 0,
+        month: new Date(arr[i].timestamp).getMonth(),
+      };
+
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
+
+      // Actualizamos las horas acumuladas
+      if (resultado[rindex - 1].state !== -1) {
+        horasPorEstado[resultado[rindex - 1].state] +=
+          resultado[rindex - 1].hours;
+      }
+
+      // console.log(horasPorMes);
+      rindex++;
+    }
+  }
+
+  // round horasPorEstado a dos decimales
+  horasPorEstado = horasPorEstado.map((x) => Math.round(x * 100) / 100);
+
+  // get the sum of all hours
+  let totalHours = horasPorEstado.reduce((a, b) => a + b, 0);
+
+  return horasPorEstado;
+}
+
+function cumulatedEfective(arr) {
+  // declara un array con 7 arrays dentro, uno para cada estado, con valores iniciales de 0
+  // el 7 es para efectivo
+
+  var resultArray = new Array(2).fill(0);
+
+  var efectiveHours = 0;
+  var averageLoad = 0;
+  var loadIndex = 1;
+
+  let resultado = [];
+  let rindex = 0;
+
+  if (arr[0].carga >= 2 && arr[0].state >= 3) {
+    arr[0]["efecstate"] = 1;
+    averageLoad = averageLoad + (arr[0].carga - averageLoad) / loadIndex;
+    loadIndex++;
+  } else {
+    arr[0]["efecstate"] = -1;
+  }
+  // Declaramos el primer valor de resultado
+  resultado[rindex] = {
+    fInit: new Date(arr[0].timestamp),
+    fEnd: new Date(arr[0].timestamp),
+    efecstate: arr[0]["efecstate"],
+    hours: 0,
+    month: new Date(arr[0].timestamp).getMonth(),
+  };
+  rindex++;
+
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i].carga >= 2 && arr[i].state >= 3) {
+      arr[i]["efecstate"] = 1;
+      averageLoad = averageLoad + (arr[i].carga - averageLoad) / loadIndex;
+      loadIndex++;
+    } else {
+      arr[i]["efecstate"] = -1;
+    }
+
+    if (arr[i].efecstate !== arr[i - 1].efecstate) {
+      // Cada que hay un cambio declaramos el nuevo item
+      resultado[rindex] = {
+        fInit: new Date(arr[i].timestamp),
+        fEnd: new Date(arr[i].timestamp),
+        efecstate: arr[i]["efecstate"],
+        hours: 0,
+        month: new Date(arr[i].timestamp).getMonth(),
+      };
+
+      // Y con ello actualizamos el item anterior
+      resultado[rindex - 1].fEnd = new Date(arr[i].timestamp);
+      resultado[rindex - 1].hours =
+        (resultado[rindex - 1].fEnd.getTime() -
+          resultado[rindex - 1].fInit.getTime()) /
+        (60 * 60 * 1000);
+
+      // Actualizamos las horas acumuladas
+      if (resultado[rindex - 1].efecstate !== -1) {
+        efectiveHours += resultado[rindex - 1].hours;
+      }
+
+      // console.log(horasPorMes);
+      rindex++;
+    }
+  }
+
+  // EL total solo son los 6 primeros estados, el 7 es efectivo,
+  // el efectivo es una composición de otros estados
+  resultArray[0] = efectiveHours;
+  resultArray[1] = averageLoad;
+
+  return resultArray;
 }

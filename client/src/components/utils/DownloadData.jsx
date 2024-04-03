@@ -7,7 +7,12 @@ export default function DownloadData({ dataPath, serverType }) {
   const [dates, setDates] = useState([]);
   const onRangeChange = (date_values, dateStrings) => {
     console.log(date_values);
-    setDates(date_values.map((item) => Math.round(item.valueOf() / 1000)));
+    if (date_values) {
+      setDates(date_values.map((item) => Math.round(item.valueOf() / 1000)));
+    } else {
+      setDates([]);
+    }
+
     console.log(dates);
   };
   return (

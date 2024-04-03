@@ -41,11 +41,20 @@ AlertsRouter.get("/statusoff", (req, res) => {
   });
 });
 
+AlertsRouter.get("/statuson", (req, res) => {
+  var query =
+    "UPDATE `persistent_data` SET `json` = '1' WHERE `persistent_data`.`tag` = 'alert_flag'";
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+    return res.json({ Status: "Success" });
+  });
+});
+
 AlertsRouter.get("/load", (req, res) => {
   var query = "SELECT * FROM `alerts` ORDER BY `id` DESC";
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
-    console.log(data);
+    // console.log(data);
     return res.json({ Status: "Success", payload: data });
   });
 });
@@ -84,10 +93,24 @@ AlertsRouter.put("/:id", (req, res) => {
       return res.json({ Error: "Error in the query" });
     }
 
-    console.log(result);
+    // console.log(result);
     return res.json({ Status: "Success", payload: result });
   });
 });
+
+const alertTypes = [
+  "Batería baja",
+  "Mantenimiento - Inicio",
+  "Mantenimiento - Fin",
+  "Mantenimiento preventivo 1",
+  "Mantenimiento preventivo 2",
+  "Mantenimiento preventivo 3",
+];
+
+const mantTypes = {
+  correctivo: "Correctivo",
+  preventivo: "Preventivo",
+};
 
 AlertsRouter.post("/download", (req, res) => {
   var dates = req.body.dateRange;
@@ -112,11 +135,11 @@ AlertsRouter.post("/download", (req, res) => {
       for (var i = 0; i < array_in.length; i++) {
         array_out[i] = {};
         array_out[i].timestamp = unixTimestampToHumanReadable(array_in[i].date);
-        array_out[i].tipo_alert = array_in[i].alert_type;
+        array_out[i].tipo_alerta = alertTypes[array_in[i].alert_type];
         array_out[i].codigo_activo = array_in[i].code_device;
         array_out[i].horometro = array_in[i].hourmeter;
         array_out[i].tonelaje = array_in[i].ton;
-        array_out[i].tipo_mantenimiento = array_in[i].mant_type;
+        array_out[i].tipo_mantenimiento = mantTypes[array_in[i].mant_type];
         array_out[i].comentarios = array_in[i].comments;
       }
 
@@ -132,6 +155,15 @@ AlertsRouter.post("/download", (req, res) => {
         payload: { data: csvString, filename: filename },
       });
     }
+  });
+});
+
+AlertsRouter.get("/legend", (req, res) => {
+  var query =
+    "SELECT * FROM `persistent_data` WHERE `persistent_data`.`tag` = 'mant_prevs'";
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+    return res.json({ payload: JSON.parse(data[0].json), Status: "Success" });
   });
 });
 

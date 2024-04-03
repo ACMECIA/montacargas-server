@@ -32,7 +32,7 @@ export default function Header() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchAlert();
-    }, 10000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 

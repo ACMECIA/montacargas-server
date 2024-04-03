@@ -87,13 +87,13 @@ export default function Login() {
               name="password"
             />
           </div>
-          <div className="flex justify-between text-white py-2">
+          {/* <div className="flex justify-between text-white py-2">
             <p className="flex items-center">
               <input className="mr-2" type="checkbox" /> Remember Me
             </p>
             <p>Forgot Password</p>
-          </div>
-          {/* <Link to={"/"}> */}
+          </div> */}
+
           <button
             type="submit"
             className="w-full my-5 py-2 bg-komatsu-gray hover:shadow-lg text-black font-semibold rounded-lg"

@@ -61,8 +61,8 @@ UsersRouter.post("/clients/add", (req, res) => {
 
   console.log(req.body.values);
 
-  //Check if mail was not registered before
-  const sqlSelect = `SELECT * FROM users WHERE email = '${req.body.values.mail}'`;
+  //Check if mail was not registered before as client
+  const sqlSelect = `SELECT * FROM users WHERE email = '${req.body.values.mail}' AND rol = 'client'`;
   db.query(sqlSelect, (err, result) => {
     // Error handling
     if (err) {
@@ -72,8 +72,14 @@ UsersRouter.post("/clients/add", (req, res) => {
       res.status(409);
       res.send({ message: "Mail already registered" });
     } else {
-      const sqlInsert = `INSERT INTO users (id, email, username, password, rol)
-      VALUES (NULL, '${req.body.values.mail}', '${req.body.values.username}', '${req.body.values.password}', 'client')`;
+      const sqlInsert = `INSERT INTO users (id, email, username, password, rol, reports, alerts)
+      VALUES (NULL, '${req.body.values.mail}', '${
+        req.body.values.username
+      }', '${req.body.values.password}', 'client', '${Number(
+        req.body.values.reports
+      )}', '${Number(req.body.values.alerts)}' )`;
+
+      console.log(sqlInsert);
       db.query(sqlInsert, (err, result) => {
         // Error handling
         if (err) {
@@ -83,16 +89,4 @@ UsersRouter.post("/clients/add", (req, res) => {
       });
     }
   });
-
-  // const sqlInsert = `INSERT INTO users (id, email, username, password, rol)
-  // VALUES (NULL, '${req.body.values.mail}', '${req.body.values.username}', '${req.body.values.password}', 'client')`;
-  // const sqlDelete = "DELETE FROM users WHERE id IN (?)";
-
-  // db.query(sqlDelete, [req.body.selectedUsers], (err, result) => {
-  //   // Error handling
-  //   if (err) {
-  //     console.log(err);
-  //   }
-  //   res.send(result);
-  // });
 });

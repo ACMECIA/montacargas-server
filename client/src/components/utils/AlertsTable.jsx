@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Input } from "antd";
 
+import { getHostPath } from "../../utils/host";
+
 // import getOrderStatus from "./lib/utils";
 const recentMaintenance = [
   {
@@ -285,9 +287,12 @@ function handleChecklistChange(event, id) {
 
   // Call your server function to update the database
   updateDatabase(id, { checklist: newCheckValue });
+  console.log("Check value", newCheckValue);
 
   if (newCheckValue) {
     disableAlertWarning();
+  } else {
+    enableAlertWarning();
   }
 }
 
@@ -340,4 +345,49 @@ function disableAlertWarning() {
     .catch((error) => {
       console.error("Error:", error);
     });
+
+  fetch(getHostPath("alertflagoff"), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  });
+}
+
+function enableAlertWarning() {
+  fetch(`/api/alerts/statuson`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Success:", data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+
+  fetch(getHostPath("alertflagon"), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  });
 }

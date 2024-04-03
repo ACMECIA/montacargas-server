@@ -11,7 +11,7 @@ export default function TermsLegend({ chartName }) {
           cuando el montacarga esta apagado (Señal de encendido apagada).
         </p>
         <p className="mb-0.5 text-xs">
-          <strong>Inoperativo:</strong> Se considera cuando el equipo activo el
+          <strong>Inoperativo:</strong> Se considera cuando el equipo activó el
           Switch de mantenimiento.
         </p>
         <p className="mb-0.5 text-xs">
@@ -40,13 +40,14 @@ export default function TermsLegend({ chartName }) {
           trabajos.
         </p>
         <p className="mb-0.5 text-xs">
+          <strong>Efectivo:</strong> Se considera cuando está en uso con carga
+          mayor igual a 2 Tn.
+        </p>
+        <p className="mb-0.5 text-xs">
           <strong>Frecuencia de uso</strong> = Tiempo de Uso / Tiempo total *
           100
         </p>
-        <p className="mb-0.5 text-xs">
-          <strong>Efectivo:</strong> = Se considera cuando está en uso con carga
-          mayor igual a 2 Tn.
-        </p>
+
         <p className="mb-0.5 text-xs">
           <strong>Frecuencia efectiva de uso</strong> = Tiempo efectivo / Tiempo
           total * 100

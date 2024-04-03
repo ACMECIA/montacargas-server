@@ -10,6 +10,7 @@ import GeneralSettings from "./utils/settings/GeneralSettings";
 import DeviceSchedule from "./utils/settings/DeviceSchedule";
 import UserManagement from "./utils/settings/UserManagement";
 import HeatmapConfig from "./utils/settings/HeatmapSettings";
+import AlertsSettings from "./utils/settings/AlertsSettings";
 
 export default function Settings() {
   const [rol, setRol] = useState("");
@@ -85,6 +86,10 @@ export function SettingsDisplay() {
             serverType={"settings"}
             dataPath={"general"}
           />
+        </Box>
+
+        <Box>
+          <AlertsSettings chartName={"Configuración de Alertas"} />
         </Box>
       </div>
     </div>

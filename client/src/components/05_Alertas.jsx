@@ -8,23 +8,9 @@ import { useNavigate } from "react-router-dom";
 import DoubleBellChart from "./charts/DoubleBellChart";
 import AlertsTable from "./utils/AlertsTable";
 import AlertsReport from "./utils/AlertsReport";
+import AlertsLegend from "./utils/AlertsLegend";
 
 export default function Alertas() {
-  // const [name, setName] = useState("");
-  // const navigate = useNavigate();
-  // useEffect(() => {
-  //   axios
-  //     .get("http://localhost:8081")
-  //     .then((res) => {
-  //       if (res.data.valid) {
-  //         setName(res.data.username);
-  //       } else {
-  //         navigate("/login");
-  //       }
-  //     })
-  //     .catch((err) => console.log(err));
-  // }, []);
-
   return (
     <div className="flex flex-col gap-4 px-4 py-4 ">
       <div className="flex flex-row gap-4 w-full">
@@ -34,6 +20,7 @@ export default function Alertas() {
             serverType={"alerts"}
             tableName={"Alertas"}
           />
+          <AlertsLegend serverType={"alerts"} dataPath={"legend"} />
         </Box>
       </div>
 

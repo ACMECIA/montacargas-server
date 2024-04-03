@@ -23,7 +23,7 @@ function downloadCSV(csv, filename) {
 export default function DownloadButton({
   dataPath,
   dateRange,
-  width = "15%",
+  width = "25%",
   serverType = "charts",
 }) {
   const [isFetching, setIsFetching] = useState(false);

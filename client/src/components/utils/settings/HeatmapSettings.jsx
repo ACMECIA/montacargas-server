@@ -127,31 +127,31 @@ export function CoordinatesLimitsShow({ defaultLimits, onEdit }) {
   // minLat, maxLat, minLong, maxLong
   return (
     <Fragment>
-      <div className="overflow:hidden w-full h-full p-4">
-        <div className="flex flex-col gap-4">
+      <div className="overflow:hidden w-full h-full">
+        <div className="flex flex-col">
           <div>
-            <div className="flex flex-row gap-4">
-              <div>
-                <strong className="text-gray-700 font-medium">
+            <div className="flex flex-row">
+              <div className="w-full">
+                <strong className="text-gray-600 font-medium">
                   Coordenadas
                 </strong>
                 <div className="flex flex-row gap-4 mt-4 justify-center items-center">
                   <div className="flex flex-col justify-center items-center">
-                    <strong className="text-black-700 font-medium">
-                      Latitud
-                    </strong>
-                    <p className="text-black-700 font-medium text-justify">
-                      Mínima: {defaultLimits.minLat} <br />
-                      Máxima: {defaultLimits.maxLat}
+                    <strong className="text-black-700  ">Latitud</strong>
+                    <p className="text-black-700 text-justify ">
+                      <span className="text-komatsu-blue-light">Mínima:</span>{" "}
+                      {defaultLimits.minLat} <br />
+                      <span className="text-komatsu-blue">Máxima:</span>{" "}
+                      {defaultLimits.maxLat}
                     </p>
                   </div>
                   <div className="flex flex-col justify-center items-center">
-                    <strong className="text-black-700 font-medium">
-                      Longitud
-                    </strong>
-                    <p className="text-black-700 font-medium text-justify">
-                      Mínima: {defaultLimits.minLon} <br />
-                      Máxima: {defaultLimits.maxLon}
+                    <strong className="text-black-700 ">Longitud</strong>
+                    <p className="text-black-700 text-justify ">
+                      <span className="text-komatsu-blue-light">Mínima:</span>{" "}
+                      {defaultLimits.minLon} <br />
+                      <span className="text-komatsu-blue">Máxima:</span>{" "}
+                      {defaultLimits.maxLon}
                     </p>
                   </div>
                 </div>

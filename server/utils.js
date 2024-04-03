@@ -27,6 +27,17 @@ UtilsRouter.get("/", (req, res) => {
   res.send("UtilsRouter");
 });
 
+const deviceStates = [
+  "Equipo Apagado",
+  "Inoperativo",
+  "Espera sin carga",
+  "Espera con carga",
+  "Traslado sin carga",
+  "Traslado con carga",
+];
+
+const deviceGStates = ["No uso", "Uso"];
+
 UtilsRouter.post("/download", (req, res) => {
   var dates = req.body.dateRange;
 
@@ -51,6 +62,9 @@ UtilsRouter.post("/download", (req, res) => {
         array_out[i].timestamp = unixTimestampToHumanReadable(
           array_out[i].timestamp
         );
+        // Cambiamos los estados de acuerdo al array de referencia
+        array_out[i].state = deviceStates[array_out[i].state];
+        array_out[i].gstate = deviceGStates[array_out[i].gstate];
       }
 
       var filename = `${array_out[0].timestamp.split(" ")[0]} hasta ${

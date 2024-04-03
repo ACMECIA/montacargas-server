@@ -41,7 +41,7 @@ export default function EstatusOperacion() {
       <div className="flex flex-row gap-4 w-full ">
         <Box>
           <DownloadData dataPath={"download"} serverType={"utils"} />
-          <GeneralReport dataPath={"download"} serverType={"utils"} />
+          <GeneralReport dataPath={"downloadreport"} />
         </Box>
         {/* <Box>
           <DoubleBellChart

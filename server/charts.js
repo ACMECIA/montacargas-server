@@ -495,34 +495,39 @@ ChartsRouter.get("/confiabilidad", (req, res) => {
   // Get the data from the database with the time interval make the query
   const maxHours = 220;
   var query = `
-  SELECT * FROM local_data 
+  SELECT * FROM alerts 
   WHERE YEAR(date) = YEAR(CURDATE())
   order by date;
   `;
+
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
-    const maxHours = 220;
+    // var array_in = data;
 
-    var array_in = data.map((row) => JSON.parse(row.data));
+    // Count the number of corrective maintenances per month
 
-    var arrayCorrective = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const counts = {};
 
-    // Obtenemos los tiempos de paradas
-    var paradasMensuales = cumulatedStateHours(array_in, 1);
+    data.forEach((item) => {
+      const month = new Date(item.date).getMonth();
+      if (item.mant_type === "correctivo") {
+        counts[month] = (counts[month] || 0) + 1;
+      }
+    });
 
-    // Asumamos que paradasMensuales es arrayCorrective*20
-    var paradasMensuales = arrayCorrective.map((x) => x * 20);
+    const result = [];
 
-    // Requerimos el tiempod e operacion por mes, que es maxHOurs - tiempo de paradas
-    var tiempoOperacion = paradasMensuales.map((x) => maxHours - x);
+    for (let i = 0; i < 12; i++) {
+      result.push({ month: i, count: counts[i] || 0 });
+    }
 
-    // Obtenemos el mtbf que es el tiempo de paradas entre el arrayCorrective, tener
-    //  en cuenta cuando arrayCorrective sea 0
-    var mtbf = tiempoOperacion.map((x, i) => x / arrayCorrective[i]);
+    console.log(result);
 
-    //Finalmente la confiabilidad, que es euler**(-tiempoOperacion/mtbf)
-    var confiabilidad = tiempoOperacion.map((x, i) => euler ** (-x / mtbf[i]));
+    var arrayCorrective = result.map((x) => x.count);
+
+    //Finalmente la confiabilidad, que es euler**(-paradasCorrectivas)
+    var confiabilidad = arrayCorrective.map((x, i) => euler ** -x);
 
     var array1 = confiabilidad;
 
@@ -535,28 +540,127 @@ ChartsRouter.get("/detenciones", (req, res) => {
   // var dates = req.body.dateRange;
 
   // Get the data from the database with the time interval make the query
-  const maxHours = 220;
+
+  var totalHours = 350;
+  var horarioInicio = 6;
+  var horarioFin = 18;
+  var hoursAwayPerDay = horarioInicio + (24 - horarioFin);
+
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'schedule'";
+
+  db.query(sqlSelect, (err, result) => {
+    // Error handling
+    if (err) {
+      console.log(err);
+    }
+
+    let schedule = JSON.parse(result[0].json);
+
+    const sumDays = schedule.weekdays.reduce((a, b) => a + b, 0);
+    totalHours = 4 * sumDays * (schedule.endHour - schedule.initHour);
+    console.log(totalHours);
+    horarioInicio = schedule.initHour;
+    horarioFin = schedule.endHour;
+
+    // res.status(200).send(data);
+    // res.send(result);
+  });
+
+  hoursAwayPerDay = horarioInicio + (24 - horarioFin);
+
+  // const maxHours = 220;
   var query = `
-  SELECT * FROM local_data 
+  SELECT * FROM alerts 
   WHERE YEAR(date) = YEAR(CURDATE())
   order by date;
   `;
+
+  // Inicializar un array para almacenar las horas acumuladas por mes
+  var horasPorMes = new Array(12).fill().map(() => ({
+    correctivo: 0,
+    preventivo: 0,
+  }));
+
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
 
-    var array_in = data.map((row) => JSON.parse(row.data));
+    var array_in = data;
+    console.log(array_in);
 
-    // Obtenermos el acumulado del estado 1, es decir inoperativo
-    var array1 = cumulatedStateHours(array_in, 1);
-    var array2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // Iterar sobre los datos y acumular las horas para cada tipo de mantenimiento y mes
+    for (let i = 0; i < array_in.length; i++) {
+      const entry = array_in[i];
+      const fecha = new Date(entry.date);
+      const mes = fecha.getMonth(); // Obtener el mes
 
-    // obtener la disponibilidad restando maxHours - array1 entre maxHours
-    // elementwise
-    array1 = array1.map((x) => (100 * (maxHours - x)) / maxHours);
+      if (entry.mant_type === "correctivo") {
+        if (
+          i + 1 < array_in.length &&
+          array_in[i + 1].mant_type === "mant-end"
+        ) {
+          horasPorMes[mes].correctivo += calcularDiferenciaHoras(
+            entry.date,
+            array_in[i + 1].date,
+            hoursAwayPerDay
+          );
+        }
+      } else if (entry.mant_type === "mant-end") {
+        if (i - 1 >= 0 && array_in[i - 1].mant_type === "correctivo") {
+          // Ya hemos contabilizado estas horas al calcular el correctivo
+        } else {
+          horasPorMes[mes].preventivo += calcularDiferenciaHoras(
+            array_in[i - 1].date,
+            entry.date,
+            hoursAwayPerDay
+          );
+        }
+      }
+    }
 
-    // Por ahora, porque aun no definimos las horas de cada tipo
+    // Preparar el resultado para el mensaje
+    var resultPorMes = horasPorMes.map((mes) => ({
+      correctivo: mes.correctivo,
+      preventivo: mes.preventivo,
+    }));
 
-    array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    console.log(resultPorMes);
+
+    var array1 = resultPorMes.map((mes) => (100 * mes.correctivo) / totalHours);
+    var array2 = resultPorMes.map((mes) => (100 * mes.preventivo) / totalHours);
+
+    // // Obtenermos el acumulado del estado 1, es decir inoperativo
+    // var array1 = cumulatedStateHours(array_in, 1);
+    // var array2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+    // // obtener la disponibilidad restando maxHours - array1 entre maxHours
+    // // elementwise
+    // array1 = array1.map((x) => (100 * (totalHours - x)) / totalHours);
+
+    // // Por ahora, porque aun no definimos las horas de cada tipo
+
+    // array1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     return res.json({ Status: "Success", payload: { array1, array2 } });
+    // return res.json({ Status: "Success" });
   });
 });
+
+// Función para calcular la diferencia de horas entre dos timestamps
+function calcularDiferenciaHoras(
+  timestampInicio,
+  timestampFin,
+  hoursAwayPerDay
+) {
+  const inicio = new Date(timestampInicio);
+  const fin = new Date(timestampFin);
+  const diferenciaMs = fin - inicio;
+  const horas = diferenciaMs / (1000 * 60 * 60); // Convertir de milisegundos a horas
+  const minutos = (horas - Math.floor(horas)) * 60; // Extraer los minutos
+  const horasDecimal = Math.floor(horas) + minutos / 60; // Convertir los minutos a fracción de hora y sumarlos a las horas enteras
+
+  const milisegundosEnUnDia = 1000 * 60 * 60 * 24;
+  const diferenciaDias = Math.floor(diferenciaMs / milisegundosEnUnDia);
+
+  const finalHours = horasDecimal - diferenciaDias * hoursAwayPerDay;
+
+  return finalHours;
+}

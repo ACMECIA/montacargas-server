@@ -1,14 +1,19 @@
 import React, { Fragment } from "react";
-import DatePickerComponent from "../charts/components/DatePicker";
-import DownloadButton from "../charts/components/DownloadButton";
+import MonthPickerComponent from "../charts/components/MonthPicker";
 import { useState } from "react";
+import DownloadReport from "../charts/components/DownloadReport";
 
 export default function GeneralReport({ dataPath, serverType }) {
-  const [dates, setDates] = useState([]);
-  const onRangeChange = (date_values, dateStrings) => {
-    console.log(date_values);
-    setDates(date_values.map((item) => Math.round(item.valueOf() / 1000)));
-    console.log(dates);
+  const [date, setDate] = useState({});
+  const onDateChange = (date_values, dateStrings) => {
+    console.log("date_values", date_values);
+    if (date_values) {
+      setDate({ target_month: date_values.$M, target_year: date_values.$y });
+    } else {
+      setDate({});
+    }
+
+    console.log("date_values", date);
   };
   return (
     <div className="py-10 px-5 space-y-2">
@@ -18,11 +23,11 @@ export default function GeneralReport({ dataPath, serverType }) {
 
       <div className="flex flex-row justify-center gap-4">
         <div>
-          <DatePickerComponent onRangeChange={onRangeChange} />
+          <MonthPickerComponent onChange={onDateChange} />
         </div>
 
-        <DownloadButton
-          dateRange={dates}
+        <DownloadReport
+          dateMonth={date}
           dataPath={dataPath}
           serverType={serverType}
         />
