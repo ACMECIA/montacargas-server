@@ -17,6 +17,18 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       TZ: America/Lima
 
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_ARBITRARY: 0
+      PMA_HOST: db
+      UPLOAD_LIMIT: 500M
+    depends_on:
+      - db
+
   api:
     depends_on:
       - db
@@ -50,3 +62,14 @@ services:
     restart: always
     ports:
       - 3000:3000
+
+  nodered:
+    depends_on:
+      - db
+      - api
+    image: nodered/node-red:3.1.9-18-minimal
+    ports:
+      - 1880:1880
+    volumes:
+      - ./nodered/nodered-data:/data
+    restart: always

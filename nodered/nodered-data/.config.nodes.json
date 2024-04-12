@@ -1,7 +1,7 @@
 {
     "node-red": {
         "name": "node-red",
-        "version": "3.1.3",
+        "version": "3.1.9",
         "local": false,
         "user": false,
         "nodes": {
@@ -427,41 +427,63 @@
             }
         }
     },
-    "node-red-contrib-flat": {
-        "name": "node-red-contrib-flat",
-        "version": "0.0.2",
+    "node-red-node-mysql": {
+        "name": "node-red-node-mysql",
+        "version": "2.0.0",
         "local": true,
         "user": true,
         "nodes": {
-            "flat": {
-                "name": "flat",
+            "mysql": {
+                "name": "mysql",
                 "types": [
-                    "flat"
+                    "MySQLdatabase",
+                    "mysql"
                 ],
                 "enabled": true,
                 "local": true,
                 "user": false,
-                "module": "node-red-contrib-flat",
-                "file": "/data/node_modules/node-red-contrib-flat/flat.js"
+                "module": "node-red-node-mysql",
+                "file": "/data/node_modules/node-red-node-mysql/68-mysql.js"
             }
         }
     },
-    "node-red-node-ping": {
-        "name": "node-red-node-ping",
-        "version": "0.3.3",
+    "node-red-contrib-timeout": {
+        "name": "node-red-contrib-timeout",
+        "version": "1.1.5",
         "local": true,
         "user": true,
         "nodes": {
-            "ping": {
-                "name": "ping",
+            "timeout": {
+                "name": "timeout",
                 "types": [
-                    "ping"
+                    "timeout"
                 ],
                 "enabled": true,
                 "local": true,
                 "user": false,
-                "module": "node-red-node-ping",
-                "file": "/data/node_modules/node-red-node-ping/88-ping.js"
+                "module": "node-red-contrib-timeout",
+                "file": "/data/node_modules/node-red-contrib-timeout/timeout.js"
+            }
+        }
+    },
+    "node-red-node-email": {
+        "name": "node-red-node-email",
+        "version": "2.2.1",
+        "local": true,
+        "user": true,
+        "nodes": {
+            "email": {
+                "name": "email",
+                "types": [
+                    "e-mail",
+                    "e-mail in",
+                    "e-mail mta"
+                ],
+                "enabled": true,
+                "local": true,
+                "user": false,
+                "module": "node-red-node-email",
+                "file": "/data/node_modules/node-red-node-email/61-email.js"
             }
         }
     }
