@@ -7,6 +7,9 @@ import { ResponsiveContainer } from "recharts";
 import { useState, useEffect } from "react";
 import RefreshButton from "./components/RefreshButton";
 import useLocalStorage from "use-local-storage";
+import { DatePicker } from "antd";
+
+const { RangePicker } = DatePicker;
 
 // Load Highcharts modules
 require("highcharts/indicators/indicators")(Highcharts);
@@ -43,18 +46,28 @@ export default function StackedBarChart({
   // const [data6, setData6] = useState(array6);
 
   const [isFetching, setIsFetching] = useState(false);
+  const [stackedRange, setStackedRange] = useState({
+    startTime: "2021-01-01 00:00:00",
+    endTime: "2021-01-01 00:00:00",
+  });
 
   const onClickFunction = () => {
-    // console.log(dateRange);
-    fetchData();
+    fetchData({ stackedRange });
   };
 
-  const fetchData = () => {
+  const fetchData = ({ stackedRange }) => {
     if (!isFetching) {
       setIsFetching(true);
-      fetch(`api/${serverType}/${dataPath}`)
+      fetch(
+        `api/${serverType}/${dataPath}?startTime=${stackedRange.startTime}&endTime=${stackedRange.endTime}`
+      )
         .then((res) => res.json())
         .then((data) => {
+          if (data.payload.length === 0) {
+            alert("No hay datos en el rango de fechas");
+            setIsFetching(false);
+            return;
+          }
           console.log(data.payload);
           setData1(data.payload.array1);
           setData2(data.payload.array2);
@@ -196,7 +209,7 @@ export default function StackedBarChart({
       <div className=" mt-3 flex flex-1 text-xs ">
         <ResponsiveContainer className={"relative"}>
           {isFetching && (
-            <div className="absolute flex flex-row justify-center gap-4 items-center justify-center bg-white z-50 w-full h-full bg-opacity-70">
+            <div className="absolute flex flex-row gap-4 items-center justify-center bg-white z-50 w-full h-full bg-opacity-70">
               Loading...
             </div>
           )}
@@ -204,6 +217,21 @@ export default function StackedBarChart({
         </ResponsiveContainer>
       </div>
       <div className="flex flex-row justify-center gap-4">
+        <RangePicker
+          picker="month"
+          onChange={(dates, dateStrings) => {
+            const startTime = dates[0]
+              .startOf("month")
+              .format("YYYY-MM-DD 00:00:00");
+            const endTime = dates[1]
+              .endOf("month")
+              .format("YYYY-MM-DD 23:59:59");
+
+            setStackedRange({ startTime, endTime });
+            console.log({ startTime, endTime });
+          }}
+          placement="topLeft"
+        />
         <RefreshButton onClickFunction={onClickFunction} />
       </div>
     </Fragment>

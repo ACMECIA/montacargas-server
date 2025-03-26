@@ -8,6 +8,9 @@ import { ResponsiveContainer } from "recharts";
 // import useSessionStorage from "react-use-sessionstorage";
 import useLocalStorage from "use-local-storage";
 import { websiteColors } from "../lib/utils/colors";
+import { DatePicker } from "antd";
+
+const { RangePicker } = DatePicker;
 
 var nombresMeses = [
   "Enero",
@@ -134,23 +137,36 @@ export default function FrenquencyChart({
   // const [data_chart, setData] = useState(data_init);
   const [isFetching, setIsFetching] = useState(false);
 
+  const [frequencyRange, setFrequencyRange] = useState({
+    startTime: "2021-01-01 00:00:00",
+    endTime: "2021-01-01 00:00:00",
+  });
+
   const onClickFunction = () => {
-    fetchData();
+    console.log(frequencyRange);
+    fetchData({ frequencyRange });
   };
 
-  const fetchData = () => {
+  const fetchData = ({ frequencyRange }) => {
     if (!isFetching) {
       setIsFetching(true);
-      fetch(`api/${serverType}/${dataPath}`)
+      fetch(
+        `api/${serverType}/${dataPath}?startTime=${frequencyRange.startTime}&endTime=${frequencyRange.endTime}`
+      )
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
+          // console.log(data);
+          if (data.payload.length === 0) {
+            alert("No hay datos en el rango de fechas");
+            setIsFetching(false);
+            return;
+          }
           var trace = [];
           for (var i = 0; i < data_init.length; i++) {
             trace.push(data_init[i]); // Copia los datos existentes de data_init
           }
           // trace = [...data_init];
-          for (var i = 0; i < data.payload.length; i++) {
+          for (let i = 0; i < data.payload.length; i++) {
             var traceAdd = generateTrace(
               data.payload[i].hours,
               data.payload[i].month,
@@ -192,7 +208,7 @@ export default function FrenquencyChart({
       <div className="overflow:hidden w-full h-full ">
         <ResponsiveContainer className={"relative"}>
           {isFetching && (
-            <div className="absolute flex flex-row justify-center gap-4 items-center justify-center bg-white z-50 w-full h-full bg-opacity-70">
+            <div className="absolute flex flex-row justify-center gap-4 items-center bg-white z-50 w-full h-full bg-opacity-70">
               Loading...
             </div>
           )}
@@ -201,6 +217,21 @@ export default function FrenquencyChart({
       </div>
 
       <div className="flex flex-row justify-center gap-4">
+        <RangePicker
+          picker="month"
+          onChange={(dates, dateStrings) => {
+            const startTime = dates[0]
+              .startOf("month")
+              .format("YYYY-MM-DD 00:00:00");
+            const endTime = dates[1]
+              .endOf("month")
+              .format("YYYY-MM-DD 23:59:59");
+
+            setFrequencyRange({ startTime, endTime });
+            console.log({ startTime, endTime });
+          }}
+          placement="topLeft"
+        />
         <RefreshButton onClickFunction={onClickFunction} />
       </div>
     </Fragment>

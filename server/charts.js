@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 
 import mysql from "mysql";
 
+import validateTimeRange from "./middlewares/validate-time-range.js";
+
 import {
   getStateInformation,
   monthlyRepetitionStates,
@@ -284,34 +286,28 @@ ChartsRouter.get("/frequency", (req, res) => {
   });
 });
 
-// ChartsRouter.get("/cfrequency", (req, res) => {
-//   // Obtenemos el intervalo de data
-//   // var dates = req.body.dateRange;
+ChartsRouter.get("/frequency2", validateTimeRange, async (req, res) => {
+  const { startTime, endTime } = req.query;
 
-//   // Get the data from the database with the time interval make the query
-//   var query = `
-//   SELECT * FROM local_data
-//   WHERE YEAR(date) = YEAR(CURDATE())
-//   order by date;
-//   `;
-//   db.query(query, (err, data) => {
-//     if (err) return res.json({ Error: "Error in the query" });
+  const query = `SELECT * FROM local_data WHERE date BETWEEN '${startTime}' AND '${endTime}' ORDER BY date;`;
 
-//     var array_in = data.map((row) => JSON.parse(row.data));
-//     var array_out = [];
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
 
-//     var array1 = Array(12).fill(0);
-//     var array2 = Array(12).fill(0);
-//     var array3 = Array(12).fill(0);
+    // check empty data
+    if (data.length === 0) {
+      return res.json({ Error: "No data found", payload: [] });
+    }
 
-//     var maxHours = getMaxHours();
-//     console.log(maxHours);
+    var array_in = data.map((row) => JSON.parse(row.data));
+    var array_out = [];
 
-//     [array1, array2, array3] = cumulatedMonthly(array_in);
+    array_out = getStateInformation(array_in);
 
-//     return res.json({ Status: "Success", payload: { array1, array2, array3 } });
-//   });
-// });
+    // return res.json({ Status: "Success" });
+    return res.json({ Status: "Success", payload: array_out });
+  });
+});
 
 ChartsRouter.get("/cfrequency", (req, res) => {
   // Obtenemos el intervalo de data
@@ -357,6 +353,52 @@ ChartsRouter.get("/cfrequency", (req, res) => {
     });
   });
 });
+
+ChartsRouter.get("/cfrequency2", (req, res) => {
+  // Obtenemos el intervalo de data
+  const { startTime, endTime } = req.query;
+
+  const sqlSelect = "SELECT * FROM persistent_data WHERE tag = 'schedule'";
+
+  db.query(sqlSelect, (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.json({ Error: "Error in the query" });
+    }
+
+    let schedule = JSON.parse(result[0].json);
+
+    let weekdays = schedule.weekdays;
+    let sumDays = weekdays.reduce((a, b) => a + b, 0);
+
+    let maxHours = 4 * sumDays * (schedule.endHour - schedule.initHour);
+
+    // Get the data from the database with the time interval make the query
+    const query = `SELECT * FROM local_data WHERE date BETWEEN '${startTime}' AND '${endTime}' ORDER BY date;`;
+
+    db.query(query, (err, data) => {
+      if (err) return res.json({ Error: "Error in the query" });
+
+      // check empty data
+      if (data.length === 0) {
+        return res.json({ Error: "No data found", payload: [] });
+      }
+
+      var array_in = data.map((row) => JSON.parse(row.data));
+      var array_out = [];
+      var array1 = Array(12).fill(0);
+      var array2 = Array(12).fill(0);
+      var array3 = Array(12).fill(0);
+
+      [array1, array2, array3] = cumulatedMonthly(array_in, maxHours);
+
+      return res.json({
+        Status: "Success",
+        payload: { array1, array2, array3 },
+      });
+    });
+  });
+});
 ChartsRouter.get("/stacked", (req, res) => {
   // Obtenemos el intervalo de data
   // var dates = req.body.dateRange;
@@ -369,6 +411,42 @@ ChartsRouter.get("/stacked", (req, res) => {
   `;
   db.query(query, (err, data) => {
     if (err) return res.json({ Error: "Error in the query" });
+
+    var array_in = data.map((row) => JSON.parse(row.data));
+
+    var array1 = Array(12).fill(0);
+    var array2 = Array(12).fill(0);
+    var array3 = Array(12).fill(0);
+    var array4 = Array(12).fill(0);
+    var array5 = Array(12).fill(0);
+    var array6 = Array(12).fill(0);
+
+    var allArrays = monthlyRepetitionStates(array_in);
+    array1 = allArrays[0];
+    array2 = allArrays[1];
+    array3 = allArrays[2];
+    array4 = allArrays[3];
+    array5 = allArrays[4];
+    array6 = allArrays[5];
+
+    return res.json({
+      Status: "Success",
+      payload: { array1, array2, array3, array4, array5, array6 },
+    });
+  });
+});
+
+ChartsRouter.get("/stacked2", (req, res) => {
+  const { startTime, endTime } = req.query;
+
+  const query = `SELECT * FROM local_data WHERE date BETWEEN '${startTime}' AND '${endTime}' ORDER BY date;`;
+  db.query(query, (err, data) => {
+    if (err) return res.json({ Error: "Error in the query" });
+
+    // check empty data
+    if (data.length === 0) {
+      return res.json({ Error: "No data found", payload: [] });
+    }
 
     var array_in = data.map((row) => JSON.parse(row.data));
 

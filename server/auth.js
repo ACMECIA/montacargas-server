@@ -75,8 +75,10 @@ AuthRouter.get("/logout", (req, res) => {
 });
 
 AuthRouter.post("/login", (req, res) => {
+  console.log(req.body);
   const sql = "SELECT * FROM users WHERE email = ? AND password = ? ";
   db.query(sql, [req.body.email, req.body.password], (err, data) => {
+    console.log(err);
     if (err) return res.json({ Errror: "Log in error server" });
     if (data.length > 0) {
       const username = data[0].username;

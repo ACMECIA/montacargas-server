@@ -7,7 +7,8 @@ import { ResponsiveContainer } from "recharts";
 import { useState, useEffect } from "react";
 import RefreshButton from "./components/RefreshButton";
 import useLocalStorage from "use-local-storage";
-
+import { DatePicker } from "antd";
+const { RangePicker } = DatePicker;
 // Load Highcharts modules
 require("highcharts/indicators/indicators")(Highcharts);
 require("highcharts/indicators/pivot-points")(Highcharts);
@@ -39,19 +40,30 @@ export default function CumulatedFrequencyChart({
   // const [data1, setData1] = useState(array1);
   // const [data2, setData2] = useState(array2);
   const [isFetching, setIsFetching] = useState(false);
+  const [frequencyRange, setFrequencyRange] = useState({
+    startTime: "2021-01-01 00:00:00",
+    endTime: "2021-01-01 00:00:00",
+  });
 
   const onClickFunction = () => {
-    // console.log(dateRange);
-    fetchData();
+    console.log(frequencyRange);
+    fetchData({ frequencyRange });
   };
 
-  const fetchData = () => {
+  const fetchData = ({ frequencyRange }) => {
     if (!isFetching) {
       setIsFetching(true);
-      fetch(`api/${serverType}/${dataPath}`)
+      fetch(
+        `api/${serverType}/${dataPath}?startTime=${frequencyRange.startTime}&endTime=${frequencyRange.endTime}`
+      )
         .then((res) => res.json())
         .then((data) => {
           console.log(data.payload);
+          if (data.payload.length === 0) {
+            alert("No hay datos en el rango de fechas");
+            setIsFetching(false);
+            return;
+          }
           setData1(data.payload.array1);
           setData2(data.payload.array2);
           setData3(data.payload.array3);
@@ -231,6 +243,21 @@ export default function CumulatedFrequencyChart({
         </ResponsiveContainer>
       </div>
       <div className="flex flex-row justify-center gap-4">
+        <RangePicker
+          picker="month"
+          onChange={(dates, dateStrings) => {
+            const startTime = dates[0]
+              .startOf("month")
+              .format("YYYY-MM-DD 00:00:00");
+            const endTime = dates[1]
+              .endOf("month")
+              .format("YYYY-MM-DD 23:59:59");
+
+            setFrequencyRange({ startTime, endTime });
+            console.log({ startTime, endTime });
+          }}
+          placement="topLeft"
+        />
         <RefreshButton onClickFunction={onClickFunction} />
       </div>
     </Fragment>

@@ -11,7 +11,7 @@ export default function EstatusMensual() {
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
           <FrenquencyChart
-            dataPath={"frequency"}
+            dataPath={"frequency2"}
             chartName={"Condición de equipo"}
             serverType={"charts"}
           />
@@ -19,7 +19,7 @@ export default function EstatusMensual() {
 
         <Box>
           <StackedBarChart
-            dataPath={"stacked"}
+            dataPath={"stacked2"}
             chartName={"Detalle de uso mensual"}
             serverType={"charts"}
           />
@@ -29,7 +29,7 @@ export default function EstatusMensual() {
       <div className="col-span-1 flex flex-col gap-4">
         <Box>
           <CumulatedFrenquencyChart
-            dataPath={"cfrequency"}
+            dataPath={"cfrequency2"}
             chartName={"Frecuencia de uso mensual acumulado"}
             serverType={"charts"}
           />

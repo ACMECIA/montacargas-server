@@ -409,6 +409,7 @@ export function cumulatedMonthly(arr, maxHours = 220) {
 }
 
 export function cumulatedStateHours(arr, state) {
+  console.log("array", arr[0]);
   // declara un array con 6 arrays dentro, uno para cada estado, con valores iniciales de 0
   let horasPorMes = new Array(6).fill(0).map(() => new Array(12).fill(0));
   let resultado = [];
@@ -429,7 +430,11 @@ export function cumulatedStateHours(arr, state) {
     // if (arr[i].state == -1) {
     //   continue; // Ignorar intervalos con state igual a -1
     // }
+
     if (arr[i].state !== arr[i - 1].state) {
+      if (!arr[i].state) {
+        console.log(arr[i].state, arr[i]);
+      }
       // Cada que hay un cambio declaramos el nuevo item
       resultado[rindex] = {
         fInit: new Date(arr[i].timestamp),

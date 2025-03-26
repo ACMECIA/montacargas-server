@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class Clock extends Component {
   constructor(props) {
@@ -11,12 +11,12 @@ class Clock extends Component {
   getFormattedDateTime() {
     const currentDate = new Date();
     const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
       hour12: true,
     };
     return currentDate.toLocaleString(undefined, options);
